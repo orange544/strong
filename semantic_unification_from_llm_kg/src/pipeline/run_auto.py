@@ -1,7 +1,9 @@
 ﻿from __future__ import annotations
 
 import os
+import re
 import time
+from collections.abc import Mapping
 from datetime import datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
@@ -19,6 +21,39 @@ from src.utils.io import save_json
 if TYPE_CHECKING:
     from src.db.database_agent import DatabaseAgent
 
+_TIMESTAMP_TOKEN_PATTERN = re.compile(r"^[0-9A-Za-z_-]{1,64}$")
+
+
+def _coerce_timestamp_token(timestamp: object | None) -> str:
+    if timestamp is None:
+        return datetime.now().strftime("%Y%m%d_%H%M%S")
+    if not isinstance(timestamp, str):
+        raise RuntimeError("timestamp must be a string")
+    token = timestamp.strip()
+    if not token:
+        raise RuntimeError("timestamp must be a non-empty string")
+    if not _TIMESTAMP_TOKEN_PATTERN.fullmatch(token):
+        raise RuntimeError("timestamp token contains unsafe characters")
+    return token
+
+
+def _coerce_llm_config(config: object) -> dict[str, str]:
+    if config is None:
+        return {}
+    if not isinstance(config, Mapping):
+        raise RuntimeError("llm_config must be a mapping when provided")
+
+    normalized: dict[str, str] = {}
+    for key in ("api_key", "base_url", "model_name"):
+        value = config.get(key, "")
+        if value is None:
+            normalized[key] = ""
+            continue
+        if not isinstance(value, str):
+            raise RuntimeError(f"llm_config['{key}'] must be a string")
+        normalized[key] = value
+    return normalized
+
 
 def run_llm_pipeline(
     ipfs: IPFSClient,
@@ -27,25 +62,27 @@ def run_llm_pipeline(
     llm_config: dict[str, str] | None = None,
 ) -> str:
     """Load sampled fields from IPFS, generate descriptions, then publish descriptions to IPFS."""
-    if llm_config is None:
-        llm_config = {}
+    normalized_timestamp = _coerce_timestamp_token(timestamp)
+    normalized_llm_config = _coerce_llm_config(llm_config)
 
     print(f"Fetching sample payload from IPFS, CID={samples_cid}")
     samples = _coerce_sample_records(ipfs.cat_json(samples_cid))
 
     fd_agent = FieldDescriptionAgent(
-        api_key=llm_config.get("api_key", ""),
-        base_url=llm_config.get("base_url", ""),
-        model_name=llm_config.get("model_name", ""),
+        api_key=normalized_llm_config.get("api_key", ""),
+        base_url=normalized_llm_config.get("base_url", ""),
+        model_name=normalized_llm_config.get("model_name", ""),
     )
 
     print("Generating field descriptions")
     field_descriptions = [fd_agent.generate_description(item) for item in samples]
 
-    fd_file = f"field_descriptions_{timestamp}.json"
+    fd_file = f"field_descriptions_{normalized_timestamp}.json"
     save_json(field_descriptions, fd_file)
 
     field_desc_cid = ipfs.add_json(field_descriptions)
+    if not isinstance(field_desc_cid, str):
+        raise RuntimeError("ipfs.add_json must return a CID string")
     print(f"Field descriptions generated, CID={field_desc_cid}")
     return field_desc_cid
 
@@ -70,8 +107,47 @@ def _new_registry() -> DatabasePluginRegistry:
     return DatabasePluginRegistry()
 
 
+def _auto_db_folder() -> str:
+    raw = AUTO_PIPELINE_DEFAULTS.get("db_folder")
+    if not isinstance(raw, str) or not raw.strip():
+        raise RuntimeError("AUTO_DB_FOLDER must be a non-empty string in .env")
+    return raw.strip()
+
+
+def _auto_previous_unified_fields_cid() -> str:
+    raw = AUTO_PIPELINE_DEFAULTS.get("previous_unified_fields_cid")
+    if raw is None:
+        return ""
+    if not isinstance(raw, str):
+        raise RuntimeError("AUTO_PREVIOUS_UNIFIED_FIELDS_CID must be a string in .env")
+    return raw.strip()
+
+
+def _auto_poll_interval_sec() -> int:
+    raw = AUTO_PIPELINE_DEFAULTS.get("poll_interval_sec")
+    if isinstance(raw, int):
+        return max(1, raw)
+    if isinstance(raw, str):
+        try:
+            return max(1, int(raw.strip()))
+        except ValueError as exc:
+            raise RuntimeError("AUTO_POLL_INTERVAL_SEC must be an integer in .env") from exc
+    raise RuntimeError("AUTO_POLL_INTERVAL_SEC must be an integer in .env")
+
+
 def _load_runtime_db_sources() -> dict[str, DatabaseSource]:
-    return load_db_sources_from_env(legacy_db_paths=DB_PATHS)
+    loaded = load_db_sources_from_env(legacy_db_paths=DB_PATHS)
+    if not isinstance(loaded, dict):
+        raise RuntimeError("load_db_sources_from_env must return a source map")
+
+    normalized: dict[str, DatabaseSource] = {}
+    for name, source in loaded.items():
+        if not isinstance(name, str) or not name.strip():
+            raise RuntimeError("database source name must be a non-empty string")
+        if not isinstance(source, DatabaseSource):
+            raise RuntimeError(f"database source '{name}' has invalid source object")
+        normalized[name] = source
+    return normalized
 
 
 def _discover_sqlite_sources_from_folder(db_folder: str) -> dict[str, DatabaseSource]:
@@ -176,7 +252,10 @@ def _run_sampling(
 ) -> str:
     from src.service.sample import run_sampling
 
-    return run_sampling(db_agents, ipfs, timestamp)
+    cid = run_sampling(db_agents, ipfs, timestamp)
+    if not isinstance(cid, str):
+        raise RuntimeError("run_sampling must return a CID string")
+    return cid
 
 
 def _unify_fields_with_existing(
@@ -188,12 +267,15 @@ def _unify_fields_with_existing(
 ) -> str:
     from src.service.semantic_service import unify_fields_with_existing
 
-    return unify_fields_with_existing(
+    cid = unify_fields_with_existing(
         field_descriptions=field_descriptions,
         existing_unified_fields_cid=existing_unified_fields_cid,
         ipfs=ipfs,
         llm_config=llm_config,
     )
+    if not isinstance(cid, str):
+        raise RuntimeError("unify_fields_with_existing must return a CID string")
+    return cid
 
 
 def _run_kg_full(
@@ -203,7 +285,15 @@ def _run_kg_full(
 ) -> tuple[str, list[str]]:
     from src.service.kg_service import run_kg_full
 
-    return run_kg_full(ipfs, unified_fields_cid, db_agents)
+    result = run_kg_full(ipfs, unified_fields_cid, db_agents)
+    if not isinstance(result, tuple) or len(result) != 2:
+        raise RuntimeError("run_kg_full must return (cypher_file, cypher_list)")
+    cypher_file, cypher_list = result
+    if not isinstance(cypher_file, str):
+        raise RuntimeError("run_kg_full cypher_file must be a string")
+    if not isinstance(cypher_list, list):
+        raise RuntimeError("run_kg_full cypher_list must be a list")
+    return cypher_file, cypher_list
 
 
 def monitor_and_process_new_database(
@@ -212,6 +302,7 @@ def monitor_and_process_new_database(
     previous_unified_fields_cid: str,
 ) -> None:
     """Incrementally process newly discovered DB sources from config and folder."""
+    poll_interval_sec = _auto_poll_interval_sec()
     try:
         initial_sources = _collect_candidate_sources(db_folder)
     except ValueError as exc:
@@ -230,7 +321,7 @@ def monitor_and_process_new_database(
         except ValueError as exc:
             # Keep watcher alive when DB_SOURCES_JSON is temporarily malformed.
             print(f"Skipping discovery due to invalid source config: {exc}")
-            time.sleep(AUTO_PIPELINE_DEFAULTS["poll_interval_sec"])
+            time.sleep(poll_interval_sec)
             continue
 
         new_sources = [
@@ -281,19 +372,19 @@ def monitor_and_process_new_database(
                 finally:
                     for agent in db_agents.values():
                         agent.close()
-        time.sleep(AUTO_PIPELINE_DEFAULTS["poll_interval_sec"])
+        time.sleep(poll_interval_sec)
 
 
 def run_auto() -> None:
     ipfs = IPFSClient()
 
-    previous_unified_fields_cid = AUTO_PIPELINE_DEFAULTS["previous_unified_fields_cid"]
+    previous_unified_fields_cid = _auto_previous_unified_fields_cid()
     if not previous_unified_fields_cid:
         raise RuntimeError("AUTO_PREVIOUS_UNIFIED_FIELDS_CID is empty in .env")
 
     monitor_and_process_new_database(
         ipfs,
-        AUTO_PIPELINE_DEFAULTS["db_folder"],
+        _auto_db_folder(),
         previous_unified_fields_cid,
     )
 

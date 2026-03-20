@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 from datetime import datetime
+from pathlib import Path
 from pprint import pprint
 from typing import TYPE_CHECKING, Any
 
@@ -46,7 +47,18 @@ if TYPE_CHECKING:
 
 def _load_runtime_db_sources() -> dict[str, DatabaseSource]:
     try:
-        return load_db_sources_from_env(legacy_db_paths=DB_PATHS)
+        loaded = load_db_sources_from_env(legacy_db_paths=DB_PATHS)
+        if not isinstance(loaded, dict):
+            raise RuntimeError("load_db_sources_from_env must return a source map")
+
+        normalized: dict[str, DatabaseSource] = {}
+        for name, source in loaded.items():
+            if not isinstance(name, str) or not name.strip():
+                raise RuntimeError("database source name must be a non-empty string")
+            if not isinstance(source, DatabaseSource):
+                raise RuntimeError(f"database source '{name}' has invalid source object")
+            normalized[name] = source
+        return normalized
     except ValueError as exc:
         # Preserve pipeline availability when DB_SOURCES_JSON is temporarily malformed.
         print(f"[warn] invalid DB_SOURCES_JSON, fallback to legacy DB_PATHS: {exc}")
@@ -86,6 +98,49 @@ def _collect_candidate_sources(db_folder: str) -> dict[str, DatabaseSource]:
     return candidates
 
 
+def _auto_db_folder() -> str:
+    raw = AUTO_PIPELINE_DEFAULTS.get("db_folder")
+    if not isinstance(raw, str) or not raw.strip():
+        raise RuntimeError("AUTO_DB_FOLDER must be a non-empty string in .env")
+    return raw.strip()
+
+
+def _resolve_sqlite_dsn(dsn: str) -> str:
+    path = Path(dsn)
+    if not path.is_absolute():
+        path = (Path(__file__).resolve().parents[2] / path).resolve()
+    return str(path)
+
+
+def _normalize_source_for_agent(source: DatabaseSource) -> DatabaseSource:
+    driver = source.driver.strip().lower()
+    if driver != "sqlite":
+        return source
+
+    resolved_path = Path(_resolve_sqlite_dsn(source.dsn.strip()))
+    if not resolved_path.is_file():
+        raise RuntimeError(
+            f"Database source '{source.name}' points to missing sqlite file: {resolved_path}"
+        )
+    try:
+        file_size = resolved_path.stat().st_size
+    except OSError as exc:
+        raise RuntimeError(
+            f"Failed to inspect sqlite file for source '{source.name}': {resolved_path}"
+        ) from exc
+    if file_size <= 0:
+        raise RuntimeError(
+            f"Database source '{source.name}' points to an empty sqlite file: {resolved_path}"
+        )
+
+    return DatabaseSource(
+        name=source.name,
+        driver=source.driver,
+        dsn=str(resolved_path),
+        options=dict(source.options),
+    )
+
+
 def _create_db_agents(
     db_sources: dict[str, DatabaseSource],
     registry: DatabasePluginRegistry,
@@ -95,8 +150,9 @@ def _create_db_agents(
         for db_name, source in db_sources.items():
             if not source.dsn.strip():
                 raise RuntimeError(f"Database source '{db_name}' has an empty DSN")
+            source_for_agent = _normalize_source_for_agent(source)
             try:
-                db_agents[db_name] = registry.create_agent(source)
+                db_agents[db_name] = registry.create_agent(source_for_agent)
             except KeyError as exc:
                 supported = ", ".join(registry.supported_drivers()) or "<none>"
                 raise RuntimeError(
@@ -114,8 +170,36 @@ def _create_db_agents(
         raise
 
 
+def _coerce_sample_records(payload: object) -> list[dict[str, Any]]:
+    records_obj: object = payload
+    if isinstance(payload, dict):
+        records_obj = payload.get("samples", [])
+
+    if not isinstance(records_obj, list):
+        raise RuntimeError("sample payload from IPFS must be a list or an artifact with 'samples'")
+
+    records: list[dict[str, Any]] = []
+    for index, item in enumerate(records_obj):
+        if not isinstance(item, dict):
+            raise RuntimeError(f"sample item at index {index} must be an object")
+
+        table = item.get("table")
+        field = item.get("field")
+        if not isinstance(table, str) or not table.strip():
+            raise RuntimeError(f"sample item at index {index} missing non-empty table")
+        if not isinstance(field, str) or not field.strip():
+            raise RuntimeError(f"sample item at index {index} missing non-empty field")
+        records.append(item)
+    return records
+
+
+def _persist_run_record(run_record: dict[str, Any], timestamp: str) -> None:
+    append_run_record(run_record)
+    save_json(run_record, f"run_manifest_{timestamp}.json")
+
+
 def run_all() -> None:
-    db_folder = AUTO_PIPELINE_DEFAULTS["db_folder"]
+    db_folder = _auto_db_folder()
     db_sources = _collect_candidate_sources(db_folder)
     if not db_sources:
         raise RuntimeError(
@@ -133,6 +217,7 @@ def run_all() -> None:
 
     run_record: dict[str, Any] = {
         "timestamp": timestamp,
+        "status": "running",
         "databases": list(db_sources.keys()),
         "llm_desc_model": LLM_DESC_CONFIG["model_name"],
         "llm_unify_model": LLM_UNIFY_CONFIG["model_name"],
@@ -187,7 +272,7 @@ def run_all() -> None:
             sample_cid = domain_entry["samples_cid"]
 
             sample_artifact = ipfs.cat_json(sample_cid)
-            domain_samples = sample_artifact.get("samples", sample_artifact)
+            domain_samples = _coerce_sample_records(sample_artifact)
             print(f"describe domain={db_name}, fields={len(domain_samples)}")
 
             field_descriptions = _generate_descriptions_parallel(
@@ -300,13 +385,24 @@ def run_all() -> None:
         run_record["cypher_cid"] = cypher_cid
         run_record["cypher_count"] = len(cypher_list)
 
-
         # ---------- Step 5: local registry ----------
-        append_run_record(run_record)
+        run_record["status"] = "completed"
+        try:
+            _persist_run_record(run_record, timestamp)
+        except Exception as exc:  # noqa: BLE001
+            print(f"[warn] failed to persist run record: {exc}")
 
         print("\nrun summary:")
         pprint(run_record)
         print(f"generated cypher count: {len(cypher_list)}")
+    except Exception as exc:  # noqa: BLE001
+        run_record["status"] = "failed"
+        run_record["error"] = str(exc)
+        try:
+            _persist_run_record(run_record, timestamp)
+        except Exception as persist_exc:  # noqa: BLE001
+            print(f"[warn] failed to persist failed run record: {persist_exc}")
+        raise
 
     finally:
         for agent in db_agents.values():

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Dict
 
 from src.configs.config import DB_PATHS
 from src.db.database_agent import DatabaseAgent, get_all_fields
@@ -15,7 +14,18 @@ from src.utils.io import save_json
 
 
 def _load_runtime_db_sources() -> dict[str, DatabaseSource]:
-    return load_db_sources_from_env(legacy_db_paths=DB_PATHS)
+    loaded = load_db_sources_from_env(legacy_db_paths=DB_PATHS)
+    if not isinstance(loaded, dict):
+        raise RuntimeError("load_db_sources_from_env must return a source map")
+
+    normalized: dict[str, DatabaseSource] = {}
+    for name, source in loaded.items():
+        if not isinstance(name, str) or not name.strip():
+            raise RuntimeError("database source name must be a non-empty string")
+        if not isinstance(source, DatabaseSource):
+            raise RuntimeError(f"database source '{name}' has invalid source object")
+        normalized[name] = source
+    return normalized
 
 
 def _create_agent_for_source(
@@ -36,7 +46,7 @@ def run_sampling_only(
     *,
     upload_to_ipfs: bool = False,
     timestamp: str | None = None,
-) -> Dict[str, object]:
+) -> dict[str, object]:
     if timestamp is None:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
@@ -46,7 +56,7 @@ def run_sampling_only(
 
     registry = DatabasePluginRegistry()
     all_samples: list[dict[str, object]] = []
-    db_stats: Dict[str, int] = {}
+    db_stats: dict[str, int] = {}
     for db_name, source in db_sources.items():
         print(f"[Sampling] {db_name} [{source.driver}] -> {source.dsn}")
         agent = _create_agent_for_source(registry, source)
@@ -62,7 +72,7 @@ def run_sampling_only(
 
     output_file = save_json(all_samples, f"samples_{timestamp}.json")
 
-    result: Dict[str, object] = {
+    result: dict[str, object] = {
         "timestamp": timestamp,
         "output_file": output_file,
         "total_fields": len(all_samples),

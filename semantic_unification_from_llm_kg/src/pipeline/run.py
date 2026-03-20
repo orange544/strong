@@ -46,6 +46,37 @@ if TYPE_CHECKING:
     from src.db.database_agent import DatabaseAgent
 
 
+def _domain_share_required_str(key: str) -> str:
+    raw = DOMAIN_SHARE_DEFAULTS.get(key)
+    if not isinstance(raw, str) or not raw.strip():
+        raise RuntimeError(f"DOMAIN_SHARE_DEFAULTS['{key}'] must be a non-empty string")
+    return raw.strip()
+
+
+def _domain_share_optional_str(key: str) -> str | None:
+    raw = DOMAIN_SHARE_DEFAULTS.get(key)
+    if raw is None:
+        return None
+    if not isinstance(raw, str):
+        raise RuntimeError(f"DOMAIN_SHARE_DEFAULTS['{key}'] must be a string when provided")
+    value = raw.strip()
+    if not value:
+        return None
+    return value
+
+
+def _domain_share_timeout_sec() -> int:
+    raw = DOMAIN_SHARE_DEFAULTS.get("timeout_sec")
+    if isinstance(raw, int):
+        return max(3, raw)
+    if isinstance(raw, str):
+        try:
+            return max(3, int(raw.strip()))
+        except ValueError as exc:
+            raise RuntimeError("DOMAIN_SHARE_DEFAULTS['timeout_sec'] must be an integer") from exc
+    raise RuntimeError("DOMAIN_SHARE_DEFAULTS['timeout_sec'] must be an integer")
+
+
 def _ensure_ipfs_chain_binary(binary_path: Path, go_norn_root: Path | None) -> None:
     if binary_path.exists():
         if binary_path.is_file():
@@ -135,7 +166,18 @@ def _put_file_on_chain(
 
 
 def _load_runtime_db_sources() -> dict[str, DatabaseSource]:
-    return load_db_sources_from_env(legacy_db_paths=DB_PATHS)
+    loaded = load_db_sources_from_env(legacy_db_paths=DB_PATHS)
+    if not isinstance(loaded, dict):
+        raise RuntimeError("load_db_sources_from_env must return a source map")
+
+    normalized: dict[str, DatabaseSource] = {}
+    for name, source in loaded.items():
+        if not isinstance(name, str) or not name.strip():
+            raise RuntimeError("database source name must be a non-empty string")
+        if not isinstance(source, DatabaseSource):
+            raise RuntimeError(f"database source '{name}' has invalid source object")
+        normalized[name] = source
+    return normalized
 
 
 def _new_registry() -> DatabasePluginRegistry:
@@ -177,16 +219,13 @@ def run_all() -> None:
     domain_timeout_sec = PIPELINE_CONFIG["llm_desc_domain_timeout_sec"]
     max_fields_per_domain = PIPELINE_CONFIG["run_max_fields_per_domain"]
 
-    ipfs_chain_bin = Path(DOMAIN_SHARE_DEFAULTS["ipfs_chain_bin"])
-    go_norn_root = (
-        Path(DOMAIN_SHARE_DEFAULTS["go_norn_root"])
-        if DOMAIN_SHARE_DEFAULTS.get("go_norn_root")
-        else None
-    )
-    chain_receiver = DOMAIN_SHARE_DEFAULTS["receiver"]
-    chain_rpc_addr = DOMAIN_SHARE_DEFAULTS["rpc_addr"]
-    chain_ipfs_api = DOMAIN_SHARE_DEFAULTS["ipfs_api"]
-    chain_timeout_sec = int(DOMAIN_SHARE_DEFAULTS["timeout_sec"])
+    ipfs_chain_bin = Path(_domain_share_required_str("ipfs_chain_bin"))
+    go_norn_root_value = _domain_share_optional_str("go_norn_root")
+    go_norn_root = Path(go_norn_root_value) if go_norn_root_value else None
+    chain_receiver = _domain_share_required_str("receiver")
+    chain_rpc_addr = _domain_share_required_str("rpc_addr")
+    chain_ipfs_api = _domain_share_required_str("ipfs_api")
+    chain_timeout_sec = _domain_share_timeout_sec()
     _ensure_ipfs_chain_binary(ipfs_chain_bin, go_norn_root)
 
     run_record: dict[str, Any] = {

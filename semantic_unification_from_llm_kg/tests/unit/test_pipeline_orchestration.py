@@ -7,20 +7,22 @@ import sys
 import time
 from collections.abc import Callable
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 import src.kg.kg_agent as kg_agent
+import src.pipeline.orchestration_common as orchestration_common
 import src.pipeline.run as pipeline_run
 import src.pipeline.run_auto as run_auto
 import src.pipeline.run_domain_share as domain_share
+import src.pipeline.run_initial as run_initial
 import src.pipeline.run_sampling as run_sampling
 import src.service.semantic_service as semantic_service
 from src.db.database_agent import DatabaseAgent
-from src.db.plugin_registry import DatabaseSource
+from src.db.plugin_registry import DatabasePluginRegistry, DatabaseSource
 
 
 class FakeDatabaseAgent:
@@ -103,7 +105,7 @@ def test_generate_descriptions_parallel_handles_agent_failure() -> None:
         {"table": "movie", "field": "good", "samples": [1]},
         {"table": "movie", "field": "bad", "samples": [2]},
     ]
-    result = pipeline_run._generate_descriptions_parallel(
+    result = orchestration_common.generate_descriptions_parallel(
         fd_agent=Agent(),
         samples=samples,
         max_workers=2,
@@ -126,7 +128,7 @@ def test_generate_descriptions_parallel_handles_timeout() -> None:
                 "description": "slow",
             }
 
-    result = pipeline_run._generate_descriptions_parallel(
+    result = orchestration_common.generate_descriptions_parallel(
         fd_agent=SlowAgent(),
         samples=[{"table": "movie", "field": "title", "samples": ["a"]}],
         max_workers=1,
@@ -268,6 +270,18 @@ def test_run_all_uses_full_orchestration_path(
     assert record["cypher_count"] == 1
     assert record["domains"][0]["db_name"] == "ONE"
     assert record["domains"][1]["db_name"] == "TWO"
+
+
+def test_run_load_runtime_db_sources_validates_source_object(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        pipeline_run,
+        "load_db_sources_from_env",
+        lambda *, legacy_db_paths: {"ONE": object()},
+    )
+    with pytest.raises(RuntimeError, match="invalid source object"):
+        pipeline_run._load_runtime_db_sources()
 
 
 def test_run_domain_share_happy_path_with_mock_llm(
@@ -673,7 +687,7 @@ def test_run_domain_share_strict_raises_on_description_chain_failure(
 def test_run_domain_share_create_agent_for_source_validates_sqlite_dsn(
     tmp_path: Path,
 ) -> None:
-    registry = domain_share.DatabasePluginRegistry()
+    registry = DatabasePluginRegistry()
 
     with pytest.raises(RuntimeError, match="empty DSN"):
         domain_share._create_agent_for_source(
@@ -706,7 +720,7 @@ def test_run_domain_share_sample_fields_falls_back_when_agent_is_not_sqlite(
         ],
     )
 
-    samples = domain_share._sample_fields_for_domain(NoConnAgent(), max_fields=1)
+    samples = domain_share._sample_fields_for_domain(cast(Any, NoConnAgent()), max_fields=1)
     assert len(samples) == 1
     assert samples[0]["field"] == "id"
 
@@ -734,7 +748,7 @@ def test_run_domain_share_sample_fields_falls_back_when_sqlite_introspection_fai
         ],
     )
 
-    samples = domain_share._sample_fields_for_domain(BrokenAgent(), max_fields=1)
+    samples = domain_share._sample_fields_for_domain(cast(Any, BrokenAgent()), max_fields=1)
     assert len(samples) == 1
     assert samples[0]["field"] == "id"
 
@@ -812,12 +826,12 @@ def test_run_auto_monitor_processes_new_db_once_and_closes_agent(
     monkeypatch.setattr(run_auto, "run_llm_pipeline", lambda *_args, **_kwargs: "desc-cid")
     monkeypatch.setattr(run_auto, "_unify_fields_with_existing", lambda **_kwargs: "uf-cid")
     monkeypatch.setattr(run_auto, "_run_kg_full", lambda *_args, **_kwargs: ("cypher.json", []))
-    monkeypatch.setattr(run_auto.time, "sleep", fake_sleep)
+    monkeypatch.setattr("src.pipeline.run_auto.time.sleep", fake_sleep)
     monkeypatch.setattr(run_auto, "AUTO_PIPELINE_DEFAULTS", {"poll_interval_sec": 0})
     monkeypatch.setattr(ipfs, "cat_json", lambda _cid: [])
 
     with pytest.raises(RuntimeError, match="stop loop"):
-        run_auto.monitor_and_process_new_database(ipfs, "data/dbs", "old-uf-cid")
+        run_auto.monitor_and_process_new_database(cast(Any, ipfs), "data/dbs", "old-uf-cid")
 
     assert len(run_sampling_calls) == 1
     assert len(created_agents) == 1
@@ -886,12 +900,12 @@ def test_run_auto_monitor_retries_failed_new_source_until_success(
 
     monkeypatch.setattr(run_auto, "_unify_fields_with_existing", fake_unify_fields_with_existing)
     monkeypatch.setattr(run_auto, "_run_kg_full", lambda *_args, **_kwargs: ("cypher.json", []))
-    monkeypatch.setattr(run_auto.time, "sleep", fake_sleep)
+    monkeypatch.setattr("src.pipeline.run_auto.time.sleep", fake_sleep)
     monkeypatch.setattr(run_auto, "AUTO_PIPELINE_DEFAULTS", {"poll_interval_sec": 0})
     monkeypatch.setattr(ipfs, "cat_json", lambda _cid: [])
 
     with pytest.raises(RuntimeError, match="stop loop"):
-        run_auto.monitor_and_process_new_database(ipfs, "data/dbs", "old-uf-cid")
+        run_auto.monitor_and_process_new_database(cast(Any, ipfs), "data/dbs", "old-uf-cid")
 
     assert run_sampling_attempts["count"] == 2
     assert unify_calls["count"] == 1
@@ -963,12 +977,12 @@ def test_run_auto_monitor_ignores_sqlite_dsn_format_changes(
         monkeypatch.setattr(run_auto, "run_llm_pipeline", lambda *_args, **_kwargs: "desc-cid")
         monkeypatch.setattr(run_auto, "_unify_fields_with_existing", lambda **_kwargs: "uf-cid")
         monkeypatch.setattr(run_auto, "_run_kg_full", lambda *_args, **_kwargs: ("cypher.json", []))
-        monkeypatch.setattr(run_auto.time, "sleep", fake_sleep)
+        monkeypatch.setattr("src.pipeline.run_auto.time.sleep", fake_sleep)
         monkeypatch.setattr(run_auto, "AUTO_PIPELINE_DEFAULTS", {"poll_interval_sec": 0})
         monkeypatch.setattr(ipfs, "cat_json", lambda _cid: [])
 
         with pytest.raises(RuntimeError, match="stop loop"):
-            run_auto.monitor_and_process_new_database(ipfs, "data/dbs", "old-uf-cid")
+            run_auto.monitor_and_process_new_database(cast(Any, ipfs), "data/dbs", "old-uf-cid")
 
         assert create_agent_calls == []
         assert run_sampling_calls == []
@@ -1007,7 +1021,7 @@ def test_run_auto_llm_pipeline_generates_and_uploads_descriptions(
     monkeypatch.setattr(run_auto, "FieldDescriptionAgent", FakeFieldDescriptionAgent)
     monkeypatch.setattr(run_auto, "save_json", lambda _data, _name: "ignored.json")
 
-    cid = run_auto.run_llm_pipeline(fake_ipfs, "samples-cid", timestamp="20260319_000000")
+    cid = run_auto.run_llm_pipeline(cast(Any, fake_ipfs), "samples-cid", timestamp="20260319_000000")
 
     assert cid.startswith("cid_")
     payload = fake_ipfs.cat_json(cid)
@@ -1031,7 +1045,7 @@ def test_run_auto_llm_pipeline_rejects_invalid_sample_payload(
     fake_ipfs._storage["samples-cid"] = samples_payload
 
     with pytest.raises(RuntimeError, match=error_pattern):
-        run_auto.run_llm_pipeline(fake_ipfs, "samples-cid", timestamp="20260319_000000")
+        run_auto.run_llm_pipeline(cast(Any, fake_ipfs), "samples-cid", timestamp="20260319_000000")
 
 
 def test_semantic_service_falls_back_to_unify_within_domain(
@@ -1072,7 +1086,7 @@ def test_semantic_service_falls_back_to_unify_within_domain(
     updated_cid = semantic_service.unify_fields_with_existing(
         field_descriptions=[{"table": "movie", "field": "year", "description": "release year"}],
         existing_unified_fields_cid=existing_cid,
-        ipfs=fake_ipfs,
+        ipfs=cast(Any, fake_ipfs),
         llm_config={},
         timestamp="20260319_000000",
     )
@@ -1123,7 +1137,7 @@ def test_semantic_service_prefers_legacy_unify_fields_when_available(
     updated_cid = semantic_service.unify_fields_with_existing(
         field_descriptions=[{"table": "movie", "field": "id", "description": "identifier"}],
         existing_unified_fields_cid=existing_cid,
-        ipfs=fake_ipfs,
+        ipfs=cast(Any, fake_ipfs),
         llm_config={},
         timestamp="20260319_000000",
     )
@@ -1156,7 +1170,7 @@ def test_semantic_service_rejects_invalid_existing_unified_schema(
         semantic_service.unify_fields_with_existing(
             field_descriptions=[{"table": "movie", "field": "id", "description": "identifier"}],
             existing_unified_fields_cid="bad-existing-cid",
-            ipfs=fake_ipfs,
+            ipfs=cast(Any, fake_ipfs),
             llm_config={},
             timestamp="20260319_000000",
         )
@@ -1248,6 +1262,371 @@ def test_run_auto_create_agent_for_source_validates_dsn_and_driver(
             db_file.unlink()
 
 
+def test_run_initial_create_db_agents_validates_sqlite_dsn_file_checks() -> None:
+    class CapturingRegistry:
+        def __init__(self) -> None:
+            self.sources: list[DatabaseSource] = []
+
+        def create_agent(self, source: DatabaseSource) -> FakeDatabaseAgent:
+            self.sources.append(source)
+            return FakeDatabaseAgent(source.dsn)
+
+        def supported_drivers(self) -> tuple[str, ...]:
+            return ("sqlite", "postgres")
+
+    registry = CapturingRegistry()
+    missing_source = DatabaseSource(name="MISSING", driver="sqlite", dsn="outputs/missing_init.db", options={})
+    with pytest.raises(RuntimeError, match="missing sqlite file"):
+        run_initial._create_db_agents({"MISSING": missing_source}, cast(Any, registry))
+
+    repo_root = Path(__file__).resolve().parents[2]
+    empty_file = repo_root / "outputs" / f"test_run_initial_empty_{time.time_ns()}.db"
+    empty_file.parent.mkdir(parents=True, exist_ok=True)
+    empty_file.write_text("", encoding="utf-8")
+    try:
+        with pytest.raises(RuntimeError, match="empty sqlite file"):
+            run_initial._create_db_agents(
+                {"EMPTY": DatabaseSource(name="EMPTY", driver="sqlite", dsn=str(empty_file), options={})},
+                cast(Any, registry),
+            )
+    finally:
+        if empty_file.exists():
+            empty_file.unlink()
+
+    db_file = repo_root / "outputs" / f"test_run_initial_relative_{time.time_ns()}.db"
+    db_file.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        conn = sqlite3.connect(str(db_file))
+        conn.execute("CREATE TABLE t (id INTEGER PRIMARY KEY)")
+        conn.commit()
+        conn.close()
+        relative_dsn = str(db_file.relative_to(repo_root))
+        db_agents = run_initial._create_db_agents(
+            {"REL": DatabaseSource(name="REL", driver="sqlite", dsn=relative_dsn, options={})},
+            cast(Any, registry),
+        )
+        assert list(db_agents.keys()) == ["REL"]
+        assert Path(db_agents["REL"].db_path).resolve() == db_file.resolve()
+        assert Path(registry.sources[-1].dsn).resolve() == db_file.resolve()
+        for agent in db_agents.values():
+            agent.close()
+    finally:
+        if db_file.exists():
+            db_file.unlink()
+
+
+def test_run_initial_create_db_agents_keeps_non_sqlite_source_unchanged() -> None:
+    class CapturingRegistry:
+        def __init__(self) -> None:
+            self.sources: list[DatabaseSource] = []
+
+        def create_agent(self, source: DatabaseSource) -> FakeDatabaseAgent:
+            self.sources.append(source)
+            return FakeDatabaseAgent(source.dsn)
+
+        def supported_drivers(self) -> tuple[str, ...]:
+            return ("sqlite", "postgres")
+
+    registry = CapturingRegistry()
+    source = DatabaseSource(
+        name="PG",
+        driver="postgres",
+        dsn="postgresql://127.0.0.1:5432/app",
+        options={},
+    )
+    db_agents = run_initial._create_db_agents({"PG": source}, cast(Any, registry))
+
+    assert registry.sources[0].dsn == source.dsn
+    assert db_agents["PG"].db_path == source.dsn
+    for agent in db_agents.values():
+        agent.close()
+
+
+def test_run_initial_load_runtime_db_sources_falls_back_on_legacy(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def _raise_invalid(
+        *,
+        legacy_db_paths: dict[str, str],
+    ) -> dict[str, DatabaseSource]:
+        del legacy_db_paths
+        raise ValueError("bad source json")
+
+    monkeypatch.setattr(run_initial, "load_db_sources_from_env", _raise_invalid)
+    monkeypatch.setattr(
+        run_initial,
+        "DB_PATHS",
+        {
+            "IMDB": "data/dbs/imdb.db",
+            " ": "data/dbs/ignored.db",
+            "TMDB": "   ",
+        },
+    )
+
+    sources = run_initial._load_runtime_db_sources()
+
+    assert set(sources.keys()) == {"IMDB"}
+    assert sources["IMDB"].driver == "sqlite"
+    assert sources["IMDB"].dsn == "data/dbs/imdb.db"
+
+
+def test_run_initial_create_db_agents_closes_open_agents_on_failure(
+    tmp_path: Path,
+) -> None:
+    class FlakyRegistry:
+        def __init__(self) -> None:
+            self.created_agents: list[FakeDatabaseAgent] = []
+
+        def create_agent(self, source: DatabaseSource) -> FakeDatabaseAgent:
+            if source.name == "BAD":
+                raise ValueError("boom")
+            agent = FakeDatabaseAgent(source.dsn)
+            self.created_agents.append(agent)
+            return agent
+
+        def supported_drivers(self) -> tuple[str, ...]:
+            return ("sqlite",)
+
+    good_db = tmp_path / "good.db"
+    bad_db = tmp_path / "bad.db"
+    for db_file in (good_db, bad_db):
+        conn = sqlite3.connect(str(db_file))
+        conn.execute("CREATE TABLE t (id INTEGER PRIMARY KEY)")
+        conn.commit()
+        conn.close()
+
+    registry = FlakyRegistry()
+    sources = {
+        "GOOD": DatabaseSource(name="GOOD", driver="sqlite", dsn=str(good_db), options={}),
+        "BAD": DatabaseSource(name="BAD", driver="sqlite", dsn=str(bad_db), options={}),
+    }
+    with pytest.raises(RuntimeError, match="Failed to create database agent for source 'BAD'"):
+        run_initial._create_db_agents(sources, cast(Any, registry))
+
+    assert len(registry.created_agents) == 1
+    assert registry.created_agents[0].closed is True
+
+
+def test_run_initial_run_all_happy_path(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    fake_ipfs = FakeIPFS()
+    captured_records: list[dict[str, Any]] = []
+
+    one_db = tmp_path / "one.db"
+    two_db = tmp_path / "two.db"
+    for db_file in (one_db, two_db):
+        conn = sqlite3.connect(str(db_file))
+        conn.execute("CREATE TABLE movie (id INTEGER PRIMARY KEY, name TEXT)")
+        conn.execute("INSERT INTO movie (name) VALUES (?)", ("A",))
+        conn.commit()
+        conn.close()
+
+    monkeypatch.setattr(
+        run_initial,
+        "_collect_candidate_sources",
+        lambda _db_folder: _make_sources({"ONE": str(one_db), "TWO": str(two_db)}),
+    )
+    monkeypatch.setattr(run_initial, "DatabasePluginRegistry", lambda: FakeRegistry())
+    monkeypatch.setattr(
+        run_initial,
+        "PIPELINE_CONFIG",
+        {
+            "llm_desc_max_workers": 1,
+            "llm_desc_domain_timeout_sec": 30,
+            "run_max_fields_per_domain": 0,
+        },
+    )
+    monkeypatch.setattr(run_initial, "LLM_DESC_CONFIG", {"api_key": "", "base_url": "", "model_name": "desc"})
+    monkeypatch.setattr(run_initial, "LLM_UNIFY_CONFIG", {"api_key": "", "base_url": "", "model_name": "unify"})
+    monkeypatch.setattr(run_initial, "IPFSClient", lambda: fake_ipfs)
+    monkeypatch.setattr(run_initial, "save_json", _make_save_json(tmp_path / "outputs"))
+    monkeypatch.setattr(run_initial, "append_run_record", lambda record: captured_records.append(record))
+
+    def fake_get_all_fields(agent: FakeDatabaseAgent) -> list[dict[str, Any]]:
+        if Path(agent.db_path).name == "one.db":
+            return [{"table": "movie", "field": "name", "samples": ["A"]}]
+        return [
+            {"table": "movie", "field": "id", "samples": [1]},
+            {"table": "credits", "field": "movie_id", "samples": [1]},
+        ]
+
+    monkeypatch.setattr(run_initial, "get_all_fields", fake_get_all_fields)
+    monkeypatch.setattr(
+        run_initial,
+        "generate_db_data",
+        lambda _agents: {
+            "ONE": {"movie": ["name"]},
+            "TWO": {"movie": ["id"], "credits": ["movie_id"]},
+        },
+    )
+
+    class FakeFieldDescriptionAgent:
+        def __init__(self, api_key: str, base_url: str, model_name: str):
+            self.api_key = api_key
+            self.base_url = base_url
+            self.model_name = model_name
+
+        def generate_description(self, sample: dict[str, Any]) -> dict[str, Any]:
+            return {
+                "table": sample["table"],
+                "field": sample["field"],
+                "description": f"desc:{sample['field']}",
+            }
+
+    class FakeFieldSemanticAgent:
+        def __init__(self, api_key: str, base_url: str, model_name: str):
+            self.api_key = api_key
+            self.base_url = base_url
+            self.model_name = model_name
+
+        def unify_within_domain(self, field_desc_list: list[dict[str, Any]]) -> list[dict[str, Any]]:
+            return [
+                {
+                    "canonical_name": "within_joined",
+                    "fields": [f"{item['table']}.{item['field']}" for item in field_desc_list],
+                    "description": "within",
+                }
+            ]
+
+        def unify_across_domains(self, domain_items: list[dict[str, Any]]) -> list[dict[str, Any]]:
+            return [
+                {
+                    "canonical_name": "global_name",
+                    "fields": domain_items[0]["fields"],
+                    "description": "global",
+                }
+            ]
+
+    class FakeKnowledgeGraphAgent:
+        def generate_cypher(
+            self,
+            run_record: dict[str, Any],
+            db_data: dict[str, dict[str, list[str]]],
+            domain_field_desc_map: dict[str, list[dict[str, Any]]],
+            domain_unified_map: dict[str, list[dict[str, Any]]],
+            unified_fields: list[dict[str, Any]],
+        ) -> list[str]:
+            assert len(run_record["domains"]) == 2
+            assert "ONE" in db_data and "TWO" in db_data
+            assert "ONE" in domain_field_desc_map and "TWO" in domain_field_desc_map
+            assert "ONE" in domain_unified_map and "TWO" in domain_unified_map
+            assert len(unified_fields) == 1
+            return ["MERGE (:Smoke {name:'ok'});"]
+
+    monkeypatch.setattr(run_initial, "FieldDescriptionAgent", FakeFieldDescriptionAgent)
+    monkeypatch.setattr(run_initial, "FieldSemanticAgent", FakeFieldSemanticAgent)
+    monkeypatch.setattr(run_initial, "KnowledgeGraphAgent", FakeKnowledgeGraphAgent)
+
+    run_initial.run_all()
+
+    assert len(captured_records) == 1
+    record = captured_records[0]
+    assert record["status"] == "completed"
+    assert len(record["domains"]) == 2
+    assert record["unified_field_count"] == 1
+    assert record["cypher_count"] == 1
+
+
+def test_run_initial_run_all_persists_failed_record_before_raise(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    fake_ipfs = FakeIPFS()
+    captured_records: list[dict[str, Any]] = []
+
+    db_file = tmp_path / "bad_step.db"
+    conn = sqlite3.connect(str(db_file))
+    conn.execute("CREATE TABLE movie (id INTEGER PRIMARY KEY)")
+    conn.commit()
+    conn.close()
+
+    monkeypatch.setattr(
+        run_initial,
+        "_collect_candidate_sources",
+        lambda _db_folder: _make_sources({"BAD_STEP": str(db_file)}),
+    )
+    monkeypatch.setattr(run_initial, "DatabasePluginRegistry", lambda: FakeRegistry())
+    monkeypatch.setattr(
+        run_initial,
+        "PIPELINE_CONFIG",
+        {
+            "llm_desc_max_workers": 1,
+            "llm_desc_domain_timeout_sec": 30,
+            "run_max_fields_per_domain": 0,
+        },
+    )
+    monkeypatch.setattr(run_initial, "LLM_DESC_CONFIG", {"api_key": "", "base_url": "", "model_name": "desc"})
+    monkeypatch.setattr(run_initial, "LLM_UNIFY_CONFIG", {"api_key": "", "base_url": "", "model_name": "unify"})
+    monkeypatch.setattr(run_initial, "IPFSClient", lambda: fake_ipfs)
+    monkeypatch.setattr(run_initial, "save_json", _make_save_json(tmp_path / "outputs"))
+    monkeypatch.setattr(run_initial, "append_run_record", lambda record: captured_records.append(record))
+    monkeypatch.setattr(
+        run_initial,
+        "get_all_fields",
+        lambda _agent: (_ for _ in ()).throw(RuntimeError("sampling failed in run_initial")),
+    )
+
+    with pytest.raises(RuntimeError, match="sampling failed in run_initial"):
+        run_initial.run_all()
+
+    assert len(captured_records) == 1
+    record = captured_records[0]
+    assert record["status"] == "failed"
+    assert "sampling failed in run_initial" in record["error"]
+
+    manifest_files = list((tmp_path / "outputs").glob("run_manifest_*.json"))
+    assert len(manifest_files) == 1
+
+
+def test_run_initial_run_pipeline_calls_run_all(monkeypatch: pytest.MonkeyPatch) -> None:
+    state = {"called": 0}
+
+    def _fake_run_all() -> None:
+        state["called"] += 1
+
+    monkeypatch.setattr(run_initial, "run_all", _fake_run_all)
+    run_initial.run_pipeline()
+
+    assert state["called"] == 1
+
+
+def test_run_initial_requires_string_auto_db_folder(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(run_initial, "AUTO_PIPELINE_DEFAULTS", {"db_folder": 123})
+    with pytest.raises(RuntimeError, match="AUTO_DB_FOLDER must be a non-empty string"):
+        run_initial.run_all()
+
+
+@pytest.mark.parametrize(
+    ("payload", "error_pattern"),
+    [
+        ({"samples": "bad"}, "must be a list"),
+        ([{"field": "id", "samples": [1]}], "missing non-empty table"),
+        ([{"table": "movie", "samples": [1]}], "missing non-empty field"),
+        (["bad"], "must be an object"),
+    ],
+)
+def test_run_initial_coerce_sample_records_rejects_invalid_payload(
+    payload: object,
+    error_pattern: str,
+) -> None:
+    with pytest.raises(RuntimeError, match=error_pattern):
+        run_initial._coerce_sample_records(payload)
+
+
+def test_run_initial_coerce_sample_records_accepts_valid_artifact() -> None:
+    payload = {
+        "summary": {"db_name": "ONE"},
+        "samples": [{"table": "movie", "field": "id", "samples": [1]}],
+    }
+    records = run_initial._coerce_sample_records(payload)
+
+    assert len(records) == 1
+    assert records[0]["table"] == "movie"
+    assert records[0]["field"] == "id"
+
+
 def test_run_auto_monitor_skips_invalid_source_config(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -1276,11 +1655,11 @@ def test_run_auto_monitor_skips_invalid_source_config(
 
     monkeypatch.setattr(run_auto, "_collect_candidate_sources", fake_collect_sources)
     monkeypatch.setattr(run_auto, "_new_registry", lambda: object())
-    monkeypatch.setattr(run_auto.time, "sleep", fake_sleep)
+    monkeypatch.setattr("src.pipeline.run_auto.time.sleep", fake_sleep)
     monkeypatch.setattr(run_auto, "AUTO_PIPELINE_DEFAULTS", {"poll_interval_sec": 0})
 
     with pytest.raises(RuntimeError, match="stop loop"):
-        run_auto.monitor_and_process_new_database(ipfs, "data/dbs", "uf-cid")
+        run_auto.monitor_and_process_new_database(cast(Any, ipfs), "data/dbs", "uf-cid")
 
 
 def test_run_auto_requires_previous_unified_fields_cid(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -1288,6 +1667,18 @@ def test_run_auto_requires_previous_unified_fields_cid(monkeypatch: pytest.Monke
     monkeypatch.setattr(run_auto, "IPFSClient", lambda: object())
 
     with pytest.raises(RuntimeError, match="AUTO_PREVIOUS_UNIFIED_FIELDS_CID is empty"):
+        run_auto.run_auto()
+
+
+def test_run_auto_requires_string_db_folder(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(
+        run_auto,
+        "AUTO_PIPELINE_DEFAULTS",
+        {"previous_unified_fields_cid": "uf-cid", "db_folder": 1, "poll_interval_sec": 1},
+    )
+    monkeypatch.setattr(run_auto, "IPFSClient", lambda: object())
+
+    with pytest.raises(RuntimeError, match="AUTO_DB_FOLDER must be a non-empty string"):
         run_auto.run_auto()
 
 
@@ -1399,8 +1790,7 @@ def test_run_domain_share_put_file_on_chain_parsing_and_timeout(
             self.stderr = stderr
 
     monkeypatch.setattr(
-        domain_share.subprocess,
-        "run",
+        "src.pipeline.run_domain_share.subprocess.run",
         lambda *_args, **_kwargs: Proc(0, "  cid: cid-ok  \nTxHash : tx-ok\n", ""),
     )
     cid, tx_hash = domain_share._put_file_on_chain(
@@ -1416,8 +1806,7 @@ def test_run_domain_share_put_file_on_chain_parsing_and_timeout(
     assert tx_hash == "tx-ok"
 
     monkeypatch.setattr(
-        domain_share.subprocess,
-        "run",
+        "src.pipeline.run_domain_share.subprocess.run",
         lambda *_args, **_kwargs: Proc(0, "CID: cid-only\n", ""),
     )
     with pytest.raises(RuntimeError, match="failed to parse CID/TxHash"):
@@ -1434,7 +1823,7 @@ def test_run_domain_share_put_file_on_chain_parsing_and_timeout(
     def _raise_timeout(*_args: object, **_kwargs: object) -> Proc:
         raise std_subprocess.TimeoutExpired(cmd="ipfs-chain put", timeout=8)
 
-    monkeypatch.setattr(domain_share.subprocess, "run", _raise_timeout)
+    monkeypatch.setattr("src.pipeline.run_domain_share.subprocess.run", _raise_timeout)
     with pytest.raises(RuntimeError, match="ipfs-chain put timed out"):
         domain_share._put_file_on_chain(
             ipfs_chain_bin=fake_bin,
@@ -1464,7 +1853,7 @@ def test_run_domain_share_ensure_ipfs_chain_binary_build_error_paths(
     def raise_file_not_found(*_args: object, **_kwargs: object) -> object:
         raise FileNotFoundError("go")
 
-    monkeypatch.setattr(domain_share.subprocess, "run", raise_file_not_found)
+    monkeypatch.setattr("src.pipeline.run_domain_share.subprocess.run", raise_file_not_found)
     with pytest.raises(RuntimeError, match="go tool not found while building ipfs-chain"):
         domain_share._ensure_ipfs_chain_binary(binary_path, go_root)
 
@@ -1475,8 +1864,7 @@ def test_run_domain_share_ensure_ipfs_chain_binary_build_error_paths(
             self.stderr = stderr
 
     monkeypatch.setattr(
-        domain_share.subprocess,
-        "run",
+        "src.pipeline.run_domain_share.subprocess.run",
         lambda *_args, **_kwargs: Proc(0, "ok", ""),
     )
     with pytest.raises(RuntimeError, match="build reported success but binary is missing"):
@@ -1487,7 +1875,7 @@ def test_run_domain_share_ensure_ipfs_chain_binary_build_error_paths(
         binary_path.write_text("bin", encoding="utf-8")
         return Proc(0, "ok", "")
 
-    monkeypatch.setattr(domain_share.subprocess, "run", build_and_create)
+    monkeypatch.setattr("src.pipeline.run_domain_share.subprocess.run", build_and_create)
     domain_share._ensure_ipfs_chain_binary(binary_path, go_root)
     assert binary_path.is_file()
 
@@ -1589,6 +1977,59 @@ def test_helpers_for_chain_binary_build_error_paths(
     monkeypatch.setattr(std_subprocess, "run", _build_and_create)
     pipeline_run._ensure_ipfs_chain_binary(binary_path, go_root)
     assert binary_path.is_file()
+
+
+def test_run_helpers_parse_domain_share_defaults_strictly(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        pipeline_run,
+        "DOMAIN_SHARE_DEFAULTS",
+        {
+            "ipfs_chain_bin": "  bin/ipfs-chain.exe  ",
+            "go_norn_root": "   ",
+            "receiver": "  receiver  ",
+            "rpc_addr": " 127.0.0.1:45558 ",
+            "ipfs_api": " http://127.0.0.1:5001 ",
+            "timeout_sec": "2",
+        },
+    )
+
+    assert pipeline_run._domain_share_required_str("receiver") == "receiver"
+    assert pipeline_run._domain_share_optional_str("go_norn_root") is None
+    assert pipeline_run._domain_share_timeout_sec() == 3
+
+    monkeypatch.setattr(
+        pipeline_run,
+        "DOMAIN_SHARE_DEFAULTS",
+        {
+            "ipfs_chain_bin": "bin/ipfs-chain.exe",
+            "go_norn_root": 1,
+            "receiver": "receiver",
+            "rpc_addr": "127.0.0.1:45558",
+            "ipfs_api": "http://127.0.0.1:5001",
+            "timeout_sec": "bad",
+        },
+    )
+    with pytest.raises(RuntimeError, match="must be a string when provided"):
+        pipeline_run._domain_share_optional_str("go_norn_root")
+    with pytest.raises(RuntimeError, match="must be an integer"):
+        pipeline_run._domain_share_timeout_sec()
+
+    monkeypatch.setattr(
+        pipeline_run,
+        "DOMAIN_SHARE_DEFAULTS",
+        {
+            "ipfs_chain_bin": "bin/ipfs-chain.exe",
+            "go_norn_root": "",
+            "receiver": 9,
+            "rpc_addr": "127.0.0.1:45558",
+            "ipfs_api": "http://127.0.0.1:5001",
+            "timeout_sec": 6,
+        },
+    )
+    with pytest.raises(RuntimeError, match="must be a non-empty string"):
+        pipeline_run._domain_share_required_str("receiver")
 
 
 def test_knowledge_graph_agent_generates_expected_sections() -> None:

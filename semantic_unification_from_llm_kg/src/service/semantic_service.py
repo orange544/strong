@@ -1,11 +1,54 @@
 ﻿from __future__ import annotations
 
+import re
+from collections.abc import Mapping
 from datetime import datetime
 from typing import Any
 
 from src.llm.semantic import FieldSemanticAgent
 from src.storage.ipfs_client import IPFSClient
 from src.utils.io import save_json
+
+_TIMESTAMP_TOKEN_PATTERN = re.compile(r"^[0-9A-Za-z_-]{1,64}$")
+
+
+def _coerce_non_empty_string(value: object, *, context: str) -> str:
+    if not isinstance(value, str):
+        raise RuntimeError(f"{context} must be a string")
+    normalized = value.strip()
+    if not normalized:
+        raise RuntimeError(f"{context} must be a non-empty string")
+    return normalized
+
+
+def _coerce_timestamp_token(timestamp: object | None) -> str:
+    if timestamp is None:
+        return datetime.now().strftime("%Y%m%d_%H%M%S")
+
+    token = _coerce_non_empty_string(timestamp, context="timestamp")
+    if not _TIMESTAMP_TOKEN_PATTERN.fullmatch(token):
+        raise RuntimeError("timestamp token contains unsafe characters")
+    return token
+
+
+def _coerce_llm_config(payload: object) -> dict[str, str]:
+    if not isinstance(payload, Mapping):
+        raise RuntimeError("llm_config must be a mapping")
+
+    normalized: dict[str, str] = {}
+    for key in ("api_key", "base_url", "model_name"):
+        value = payload.get(key, "")
+        if value is None:
+            normalized[key] = ""
+            continue
+        if not isinstance(value, str):
+            raise RuntimeError(f"llm_config['{key}'] must be a string")
+        normalized[key] = value
+    return normalized
+
+
+def _coerce_cid(value: object, *, context: str) -> str:
+    return _coerce_non_empty_string(value, context=context)
 
 
 def _coerce_object_list(payload: object, *, context: str) -> list[dict[str, Any]]:
@@ -99,10 +142,14 @@ def unify_fields_with_existing(
     llm_config: dict[str, str],
     timestamp: str | None = None,
 ) -> str:
-    if timestamp is None:
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    normalized_timestamp = _coerce_timestamp_token(timestamp)
+    normalized_existing_cid = _coerce_cid(
+        existing_unified_fields_cid,
+        context="existing_unified_fields_cid",
+    )
+    normalized_llm_config = _coerce_llm_config(llm_config)
 
-    existing_payload = ipfs.cat_json(existing_unified_fields_cid)
+    existing_payload = ipfs.cat_json(normalized_existing_cid)
     existing_unified_fields = _coerce_unified_fields(
         existing_payload,
         context="existing_unified_fields",
@@ -110,17 +157,20 @@ def unify_fields_with_existing(
     normalized_field_descriptions = _coerce_field_descriptions(field_descriptions)
 
     fs_agent = FieldSemanticAgent(
-        api_key=llm_config.get("api_key", ""),
-        base_url=llm_config.get("base_url", ""),
-        model_name=llm_config.get("model_name", ""),
+        api_key=normalized_llm_config["api_key"],
+        base_url=normalized_llm_config["base_url"],
+        model_name=normalized_llm_config["model_name"],
     )
     new_unified_fields = _unify_new_fields(fs_agent, normalized_field_descriptions)
 
     updated_unified_fields = merge_unified_fields(existing_unified_fields, new_unified_fields)
 
-    uf_file = f"unified_fields_{timestamp}.json"
+    uf_file = f"unified_fields_{normalized_timestamp}.json"
     save_json(updated_unified_fields, uf_file)
-    updated_unified_fields_cid = ipfs.add_json(updated_unified_fields)
+    updated_unified_fields_cid = _coerce_cid(
+        ipfs.add_json(updated_unified_fields),
+        context="ipfs.add_json return value",
+    )
     print(f"Unified fields updated, CID={updated_unified_fields_cid}")
     return updated_unified_fields_cid
 

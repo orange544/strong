@@ -1,0 +1,11 @@
+services:
+  ipfs:
+    image: ipfs/kubo:v0.28.0
+    container_name: go-norn-ipfs
+    restart: unless-stopped
+    ports:
+      - "4001:4001"
+      - "5001:5001"
+      - "8080:8080"
+    volumes:
+      - ./data:/data/ipfs

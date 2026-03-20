@@ -1,0 +1,134 @@
+{
+  "version": "1.0.0",
+  "description": "Normalization contract for baseline artifacts used in regression comparison.",
+  "encoding": "utf-8",
+  "path_rules": [
+    {
+      "name": "windows_abs_path_to_basename",
+      "fields": [
+        "output_file",
+        "samples_file",
+        "field_descriptions_file",
+        "db_path",
+        "cypher_file",
+        "unified_fields_file",
+        "domain_unified_file"
+      ],
+      "operation": "basename_only"
+    }
+  ],
+  "replace_rules": [
+    {
+      "name": "timestamp_token",
+      "target": "string_value",
+      "pattern": "\\b\\d{8}_\\d{6}\\b",
+      "replacement": "<TS>"
+    },
+    {
+      "name": "ipfs_cid_v0",
+      "target": "string_value",
+      "pattern": "\\bQm[1-9A-HJ-NP-Za-km-z]{44}\\b",
+      "replacement": "<CID>"
+    },
+    {
+      "name": "ipfs_cid_v1",
+      "target": "string_value",
+      "pattern": "\\bbafy[1-9A-HJ-NP-Za-km-z]{20,}\\b",
+      "replacement": "<CID>"
+    },
+    {
+      "name": "txhash_hex_64",
+      "target": "string_value",
+      "pattern": "\\b0x[a-fA-F0-9]{64}\\b",
+      "replacement": "<TXHASH>"
+    },
+    {
+      "name": "register_sample_key",
+      "target": "string_value",
+      "pattern": "REGISTER_SAMPLE:[A-Za-z0-9_\\-]+",
+      "replacement": "REGISTER_SAMPLE:<RUN_ID>"
+    },
+    {
+      "name": "register_description_key",
+      "target": "string_value",
+      "pattern": "REGISTER_DESCRIPTION:[A-Za-z0-9_\\-]+",
+      "replacement": "REGISTER_DESCRIPTION:<RUN_ID>"
+    }
+  ],
+  "drop_fields": [
+    "timestamp",
+    "samples_cid",
+    "sample_chain_cid",
+    "sample_tx_hash",
+    "field_descriptions_cid",
+    "description_chain_cid",
+    "description_tx_hash",
+    "domain_unified_cid",
+    "unified_fields_cid",
+    "cypher_cid"
+  ],
+  "sort_rules": [
+    {
+      "name": "sort_samples",
+      "json_path": "$..samples",
+      "operation": "stable_sort_by",
+      "keys": [
+        "db_name",
+        "table",
+        "field"
+      ]
+    },
+    {
+      "name": "sort_field_descriptions",
+      "json_path": "$..field_descriptions",
+      "operation": "stable_sort_by",
+      "keys": [
+        "db_name",
+        "table",
+        "field"
+      ]
+    },
+    {
+      "name": "sort_domains",
+      "json_path": "$..domains",
+      "operation": "stable_sort_by",
+      "keys": [
+        "db_name",
+        "domain",
+        "domain_slug"
+      ]
+    }
+  ],
+  "assert_required_keys": [
+    {
+      "artifact_type": "sample_summary",
+      "required_all": [
+        "timestamp",
+        "output_file",
+        "total_fields",
+        "databases"
+      ]
+    },
+    {
+      "artifact_type": "all_run_record",
+      "required_all": [
+        "mode",
+        "domains",
+        "unified_fields_file",
+        "cypher_file"
+      ]
+    },
+    {
+      "artifact_type": "domain_share_manifest",
+      "required_all": [
+        "mode",
+        "domains"
+      ]
+    }
+  ],
+  "notes": [
+    "Do not normalize semantic fields such as canonical_name, fields, description, table, or field.",
+    "Parallel execution may reorder intermediate records; apply sort rules before diffing.",
+    "Normalization is for comparison only and must not alter source artifacts in outputs/."
+  ]
+}

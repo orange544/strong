@@ -1,0 +1,47 @@
+# OS / editor artifacts
+.DS_Store
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+*.iml
+
+# Python caches and virtualenvs
+**/__pycache__/
+**/*.py[cod]
+**/*.pyd
+**/.venv/
+**/venv/
+**/.pytest_cache/
+**/.mypy_cache/
+**/.ruff_cache/
+**/.hypothesis/
+**/.coverage
+**/htmlcov/
+
+# Go build/test artifacts
+**/*.test
+**/*.out
+**/go.work
+
+# Logs and runtime outputs
+**/*.log
+**/outputs/
+!**/outputs/.gitkeep
+
+# Local environment files
+**/.env
+**/.env.*
+!**/.env.example
+!**/.env.sample
+!**/.env.template
+
+# Project-specific generated artifacts
+blockchain/go-norn-main/cmd/graph/graph
+blockchain/go-norn-main/cmd/sender/sender
+semantic_unification_from_llm_kg/data/dbs/*.db
+semantic_unification_from_llm_kg/ipfs_registry.json

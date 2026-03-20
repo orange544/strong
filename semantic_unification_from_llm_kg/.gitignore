@@ -1,0 +1,20 @@
+.venv/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+__pycache__/
+*.pyc
+
+# Tooling
+.coverage
+htmlcov/
+
+# Runtime artifacts
+outputs/
+!outputs/.gitkeep
+ipfs_registry.json
+full_run_*.log
+run_test_*.log
+
+# Local env
+.env

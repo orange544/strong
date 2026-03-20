@@ -1,0 +1,406 @@
+from __future__ import annotations
+
+import re
+import subprocess
+from datetime import datetime
+from pathlib import Path
+from pprint import pprint
+from typing import TYPE_CHECKING, Any
+
+from src.configs.config import (
+    DB_PATHS,
+    DOMAIN_SHARE_DEFAULTS,
+    LLM_DESC_CONFIG,
+    LLM_UNIFY_CONFIG,
+    PIPELINE_CONFIG,
+)
+from src.db.database_agent import generate_db_data, get_all_fields
+from src.db.plugin_registry import (
+    DatabasePluginRegistry,
+    DatabaseSource,
+    load_db_sources_from_env,
+)
+from src.kg.kg_agent import KnowledgeGraphAgent
+from src.llm.description_agent import FieldDescriptionAgent
+from src.llm.semantic import FieldSemanticAgent
+from src.pipeline.orchestration_common import (
+    attach_db_name_to_domain_unified as _attach_db_name_to_domain_unified,
+)
+from src.pipeline.orchestration_common import (
+    build_sample_artifact as _build_sample_artifact,
+)
+from src.pipeline.orchestration_common import (
+    generate_descriptions_parallel as _generate_descriptions_parallel,
+)
+from src.pipeline.orchestration_common import (
+    safe_db_tag as _safe_db_tag,
+)
+from src.pipeline.orchestration_common import (
+    wrap_single_table_fields_for_cross_domain as _wrap_single_table_fields_for_cross_domain,
+)
+from src.storage.ipfs_client import IPFSClient
+from src.storage.registry import append_run_record
+from src.utils.io import save_json
+
+if TYPE_CHECKING:
+    from src.db.database_agent import DatabaseAgent
+
+
+def _ensure_ipfs_chain_binary(binary_path: Path, go_norn_root: Path | None) -> None:
+    if binary_path.exists():
+        if binary_path.is_file():
+            return
+        raise RuntimeError(f"ipfs-chain path exists but is not a file: {binary_path}")
+    if not go_norn_root:
+        raise RuntimeError(
+            f"ipfs-chain binary not found at {binary_path}, provide GO_NORN_ROOT"
+        )
+    if not go_norn_root.is_dir():
+        raise RuntimeError(f"GO_NORN_ROOT is not a directory: {go_norn_root}")
+    binary_path.parent.mkdir(parents=True, exist_ok=True)
+    cmd = ["go", "build", "-o", str(binary_path), "./cmd/ipfs-chain"]
+    try:
+        proc = subprocess.run(
+            cmd,
+            cwd=str(go_norn_root),
+            capture_output=True,
+            text=True,
+            timeout=180,
+        )
+    except FileNotFoundError as exc:
+        raise RuntimeError("go tool not found while building ipfs-chain") from exc
+    except subprocess.TimeoutExpired as exc:
+        raise RuntimeError("building ipfs-chain timed out after 180s") from exc
+    if proc.returncode != 0:
+        raise RuntimeError(
+            "failed to build ipfs-chain\n"
+            f"stdout:\n{proc.stdout}\n"
+            f"stderr:\n{proc.stderr}"
+        )
+    if not binary_path.is_file():
+        raise RuntimeError(
+            f"ipfs-chain build reported success but binary is missing: {binary_path}"
+        )
+
+
+def _put_file_on_chain(
+    *,
+    ipfs_chain_bin: Path,
+    receiver: str,
+    key: str,
+    file_path: Path,
+    rpc_addr: str,
+    ipfs_api: str,
+    timeout_sec: int,
+) -> tuple[str, str]:
+    cmd = [
+        str(ipfs_chain_bin),
+        "put",
+        "-receiver",
+        receiver,
+        "-key",
+        key,
+        "-file",
+        str(file_path),
+        "-rpc",
+        rpc_addr,
+        "-ipfs",
+        ipfs_api,
+        "-timeout",
+        str(timeout_sec),
+    ]
+    try:
+        proc = subprocess.run(
+            cmd,
+            capture_output=True,
+            text=True,
+            timeout=max(3, timeout_sec + 2),
+        )
+    except subprocess.TimeoutExpired as exc:
+        raise RuntimeError(f"ipfs-chain put timed out for key={key} after {timeout_sec}s") from exc
+
+    if proc.returncode != 0:
+        raise RuntimeError(
+            f"ipfs-chain put failed for key={key}\n"
+            f"stdout:\n{proc.stdout}\n"
+            f"stderr:\n{proc.stderr}"
+        )
+
+    cid_match = re.search(r"(?im)^\s*cid\s*:\s*(\S+)\s*$", proc.stdout)
+    tx_hash_match = re.search(r"(?im)^\s*txhash\s*:\s*(\S+)\s*$", proc.stdout)
+
+    if not cid_match or not tx_hash_match:
+        raise RuntimeError(f"failed to parse CID/TxHash from output:\n{proc.stdout}")
+    return cid_match.group(1), tx_hash_match.group(1)
+
+
+def _load_runtime_db_sources() -> dict[str, DatabaseSource]:
+    return load_db_sources_from_env(legacy_db_paths=DB_PATHS)
+
+
+def _new_registry() -> DatabasePluginRegistry:
+    return DatabasePluginRegistry()
+
+
+def _create_db_agents(
+    db_sources: dict[str, DatabaseSource],
+    registry: DatabasePluginRegistry,
+) -> dict[str, DatabaseAgent]:
+    db_agents: dict[str, DatabaseAgent] = {}
+    try:
+        for db_name, source in db_sources.items():
+            try:
+                db_agents[db_name] = registry.create_agent(source)
+            except KeyError as exc:
+                supported = ", ".join(registry.supported_drivers()) or "<none>"
+                raise RuntimeError(
+                    f"Unsupported database driver '{source.driver}' for source '{db_name}'. "
+                    f"Supported drivers: {supported}"
+                ) from exc
+        return db_agents
+    except Exception:
+        for agent in db_agents.values():
+            agent.close()
+        raise
+
+
+def run_all() -> None:
+    db_sources = _load_runtime_db_sources()
+    if not db_sources:
+        raise RuntimeError("No database sources configured. Set DB_SOURCES_JSON or DB_PATHS.")
+
+    db_agents = _create_db_agents(db_sources, _new_registry())
+    ipfs = IPFSClient()
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+    max_workers = PIPELINE_CONFIG["llm_desc_max_workers"]
+    domain_timeout_sec = PIPELINE_CONFIG["llm_desc_domain_timeout_sec"]
+    max_fields_per_domain = PIPELINE_CONFIG["run_max_fields_per_domain"]
+
+    ipfs_chain_bin = Path(DOMAIN_SHARE_DEFAULTS["ipfs_chain_bin"])
+    go_norn_root = (
+        Path(DOMAIN_SHARE_DEFAULTS["go_norn_root"])
+        if DOMAIN_SHARE_DEFAULTS.get("go_norn_root")
+        else None
+    )
+    chain_receiver = DOMAIN_SHARE_DEFAULTS["receiver"]
+    chain_rpc_addr = DOMAIN_SHARE_DEFAULTS["rpc_addr"]
+    chain_ipfs_api = DOMAIN_SHARE_DEFAULTS["ipfs_api"]
+    chain_timeout_sec = int(DOMAIN_SHARE_DEFAULTS["timeout_sec"])
+    _ensure_ipfs_chain_binary(ipfs_chain_bin, go_norn_root)
+
+    run_record: dict[str, Any] = {
+        "timestamp": timestamp,
+        "mode": "full_pipeline_with_chain",
+        "databases": list(db_sources.keys()),
+        "llm_desc_model": LLM_DESC_CONFIG["model_name"],
+        "llm_unify_model": LLM_UNIFY_CONFIG["model_name"],
+        "domains": [],
+    }
+
+    try:
+        # Step 1: per-domain sampling -> IPFS -> chain
+        for db_name, agent in db_agents.items():
+            db_tag = _safe_db_tag(db_name)
+            print(f"sampling database: {db_name}")
+            samples = get_all_fields(agent)
+            if max_fields_per_domain > 0:
+                samples = samples[:max_fields_per_domain]
+
+            for sample in samples:
+                sample["db_name"] = db_name
+
+            sample_artifact = _build_sample_artifact(db_name, timestamp, samples)
+            sample_filename = f"samples_{db_tag}_{timestamp}.json"
+            sample_saved_path = save_json(sample_artifact, sample_filename)
+            sample_file_path = Path(sample_saved_path).resolve()
+
+            sample_cid = ipfs.add_file(str(sample_file_path))
+            print(f"[IPFS] sample CID = {sample_cid}")
+
+            sample_chain_key = f"REGISTER_SAMPLE:{db_tag}_{timestamp}"
+            sample_chain_cid, sample_tx_hash = _put_file_on_chain(
+                ipfs_chain_bin=ipfs_chain_bin,
+                receiver=chain_receiver,
+                key=sample_chain_key,
+                file_path=sample_file_path,
+                rpc_addr=chain_rpc_addr,
+                ipfs_api=chain_ipfs_api,
+                timeout_sec=chain_timeout_sec,
+            )
+            print(f"[CHAIN] sample TxHash = {sample_tx_hash}")
+
+            run_record["domains"].append(
+                {
+                    "db_name": db_name,
+                    "sample_file": sample_filename,
+                    "samples_cid": sample_cid,
+                    "sample_chain_key": sample_chain_key,
+                    "sample_chain_cid": sample_chain_cid,
+                    "sample_tx_hash": sample_tx_hash,
+                    "sampled_field_count": sample_artifact["summary"]["sampled_field_count"],
+                    "total_sample_value_count": sample_artifact["summary"]["total_sample_value_count"],
+                }
+            )
+
+        # Step 2: per-domain descriptions -> IPFS -> chain
+        fd_agent = FieldDescriptionAgent(
+            api_key=LLM_DESC_CONFIG["api_key"],
+            base_url=LLM_DESC_CONFIG["base_url"],
+            model_name=LLM_DESC_CONFIG["model_name"],
+        )
+        print(
+            f"generating descriptions with workers={max_workers}, domain_timeout={domain_timeout_sec}s"
+        )
+
+        all_field_descriptions: list[dict[str, Any]] = []
+        for domain_entry in run_record["domains"]:
+            db_name = domain_entry["db_name"]
+            db_tag = _safe_db_tag(db_name)
+            sample_source_cid = domain_entry.get("sample_chain_cid") or domain_entry["samples_cid"]
+            sample_artifact = ipfs.cat_json(sample_source_cid)
+            domain_samples = sample_artifact.get("samples", sample_artifact)
+
+            print(f"describe domain={db_name}, fields={len(domain_samples)}")
+            field_descriptions = _generate_descriptions_parallel(
+                fd_agent=fd_agent,
+                samples=domain_samples,
+                max_workers=max_workers,
+                domain_timeout_sec=domain_timeout_sec,
+            )
+            for item in field_descriptions:
+                item["db_name"] = db_name
+
+            desc_artifact: dict[str, Any] = {
+                "summary": {
+                    "db_name": db_name,
+                    "timestamp": timestamp,
+                    "description_count": len(field_descriptions),
+                    "source_samples_cid": sample_source_cid,
+                },
+                "field_descriptions": field_descriptions,
+            }
+
+            desc_filename = f"field_descriptions_{db_tag}_{timestamp}.json"
+            desc_saved_path = save_json(desc_artifact, desc_filename)
+            desc_file_path = Path(desc_saved_path).resolve()
+
+            desc_cid = ipfs.add_file(str(desc_file_path))
+            print(f"[IPFS] description CID = {desc_cid}")
+
+            desc_chain_key = f"REGISTER_DESCRIPTION:{db_tag}_{timestamp}"
+            desc_chain_cid, desc_tx_hash = _put_file_on_chain(
+                ipfs_chain_bin=ipfs_chain_bin,
+                receiver=chain_receiver,
+                key=desc_chain_key,
+                file_path=desc_file_path,
+                rpc_addr=chain_rpc_addr,
+                ipfs_api=chain_ipfs_api,
+                timeout_sec=chain_timeout_sec,
+            )
+            print(f"[CHAIN] description TxHash = {desc_tx_hash}")
+
+            domain_entry["field_descriptions_file"] = desc_filename
+            domain_entry["field_descriptions_cid"] = desc_cid
+            domain_entry["description_chain_key"] = desc_chain_key
+            domain_entry["description_chain_cid"] = desc_chain_cid
+            domain_entry["description_tx_hash"] = desc_tx_hash
+            domain_entry["description_count"] = len(field_descriptions)
+
+            all_field_descriptions.extend(field_descriptions)
+
+        # Step 3: two-stage semantic unification
+        fs_agent = FieldSemanticAgent(
+            api_key=LLM_UNIFY_CONFIG["api_key"],
+            base_url=LLM_UNIFY_CONFIG["base_url"],
+            model_name=LLM_UNIFY_CONFIG["model_name"],
+        )
+
+        domain_level_items: list[dict[str, Any]] = []
+        for domain_entry in run_record["domains"]:
+            db_name = domain_entry["db_name"]
+            desc_source_cid = (
+                domain_entry.get("description_chain_cid")
+                or domain_entry["field_descriptions_cid"]
+            )
+            desc_artifact = ipfs.cat_json(desc_source_cid)
+            field_descriptions = desc_artifact.get("field_descriptions", [])
+
+            tables = {item["table"] for item in field_descriptions if item.get("table")}
+            if len(tables) <= 1:
+                print(f"single-table domain {db_name}, skip within-domain unify")
+                domain_unified = _wrap_single_table_fields_for_cross_domain(field_descriptions)
+            else:
+                print(f"within-domain unify {db_name}, fields={len(field_descriptions)}")
+                domain_unified = fs_agent.unify_within_domain(field_descriptions)
+                domain_unified = _attach_db_name_to_domain_unified(domain_unified, db_name)
+
+            domain_unified_file = f"domain_unified_{_safe_db_tag(db_name)}_{timestamp}.json"
+            save_json(domain_unified, domain_unified_file)
+            domain_unified_cid = ipfs.add_json(domain_unified)
+
+            domain_entry["domain_unified_file"] = domain_unified_file
+            domain_entry["domain_unified_cid"] = domain_unified_cid
+            domain_entry["domain_unified_count"] = len(domain_unified)
+            domain_level_items.extend(domain_unified)
+
+        print(f"cross-domain unify candidates={len(domain_level_items)}")
+        unified_fields = fs_agent.unify_across_domains(domain_level_items)
+
+        uf_file = f"unified_fields_{timestamp}.json"
+        save_json(unified_fields, uf_file)
+        unified_fields_cid = ipfs.add_json(unified_fields)
+        run_record["unified_fields_file"] = uf_file
+        run_record["unified_fields_cid"] = unified_fields_cid
+        run_record["unified_field_count"] = len(unified_fields)
+
+        # Step 4: KG Cypher generation
+        db_data = generate_db_data(db_agents)
+        kg_agent = KnowledgeGraphAgent()
+
+        domain_field_desc_map: dict[str, list[dict[str, Any]]] = {}
+        domain_unified_map: dict[str, list[dict[str, Any]]] = {}
+
+        for domain_entry in run_record["domains"]:
+            db_name = domain_entry["db_name"]
+            desc_source_cid = (
+                domain_entry.get("description_chain_cid")
+                or domain_entry["field_descriptions_cid"]
+            )
+            desc_artifact = ipfs.cat_json(desc_source_cid)
+            domain_field_desc_map[db_name] = desc_artifact.get("field_descriptions", [])
+            domain_unified_map[db_name] = ipfs.cat_json(domain_entry["domain_unified_cid"])
+
+        cypher_list = kg_agent.generate_cypher(
+            run_record=run_record,
+            db_data=db_data,
+            domain_field_desc_map=domain_field_desc_map,
+            domain_unified_map=domain_unified_map,
+            unified_fields=unified_fields,
+        )
+
+        cypher_file = f"cypher_{timestamp}.json"
+        save_json(cypher_list, cypher_file)
+        cypher_cid = ipfs.add_json(cypher_list)
+        run_record["cypher_file"] = cypher_file
+        run_record["cypher_cid"] = cypher_cid
+        run_record["cypher_count"] = len(cypher_list)
+
+        # Step 5: registry
+        append_run_record(run_record)
+
+        print("\nrun summary:")
+        pprint(run_record)
+        print(f"generated cypher count: {len(cypher_list)}")
+
+    finally:
+        for agent in db_agents.values():
+            agent.close()
+
+
+def run_pipeline() -> None:
+    run_all()
+
+
+if __name__ == "__main__":
+    run_all()

@@ -252,3 +252,32 @@ def test_registry_append_and_latest_roundtrip_with_utf8(
     assert latest == second
     assert "首次运行" in content
     assert "第二次运行" in content
+
+
+def test_registry_load_existing_non_object_payload_returns_empty_runs(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    registry_path = tmp_path / "registry_non_object.json"
+    registry_path.write_text(json.dumps(["bad", "shape"]), encoding="utf-8")
+    monkeypatch.setattr(registry, "REGISTRY_PATH", str(registry_path))
+
+    loaded = registry.load_registry()
+    assert loaded == {"runs": []}
+
+
+def test_registry_append_resets_invalid_runs_and_latest_non_object(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    registry_path = tmp_path / "registry_invalid_runs.json"
+    monkeypatch.setattr(registry, "REGISTRY_PATH", str(registry_path))
+
+    registry_path.write_text(json.dumps({"runs": {"bad": "shape"}}), encoding="utf-8")
+    registry.append_run_record({"id": 10})
+    loaded = registry.load_registry()
+    assert loaded["runs"] == [{"id": 10}]
+
+    registry_path.write_text(json.dumps({"runs": [123]}), encoding="utf-8")
+    latest = registry.get_latest_run()
+    assert latest is None

@@ -1,9 +1,9 @@
-from typing import Dict, List, Any
+from typing import Any
 
 
 def esc(value: Any) -> str:
-    value = str(value)
-    return value.replace("\\", "\\\\").replace("'", "\\'")
+    text = str(value)
+    return text.replace("\\", "\\\\").replace("'", "\\'")
 
 
 class KnowledgeGraphAgent:
@@ -39,13 +39,13 @@ class KnowledgeGraphAgent:
 
     def generate_cypher(
         self,
-        run_record: Dict[str, Any],
-        db_data: Dict[str, Dict[str, List[str]]],
-        domain_field_desc_map: Dict[str, List[Dict[str, Any]]],
-        domain_unified_map: Dict[str, List[Dict[str, Any]]],
-        unified_fields: List[Dict[str, Any]],
-    ) -> List[str]:
-        cypher_list: List[str] = []
+        run_record: dict[str, Any],
+        db_data: dict[str, dict[str, list[str]]],
+        domain_field_desc_map: dict[str, list[dict[str, Any]]],
+        domain_unified_map: dict[str, list[dict[str, Any]]],
+        unified_fields: list[dict[str, Any]],
+    ) -> list[str]:
+        cypher_list: list[str] = []
 
         # =========================================================
         # 1. DataSource / ResourceFile
@@ -141,7 +141,7 @@ MERGE (a)-[:BELONGS_TO_TABLE]->(t);
         for db_name, tables_data in db_data.items():
             db_esc = esc(db_name)
 
-            for table_name in tables_data.keys():
+            for table_name in tables_data:
                 table_esc = esc(table_name)
                 entity_name = f"{db_name}.{table_name}"
                 entity_esc = esc(entity_name)
@@ -287,7 +287,7 @@ MERGE (rf)-[:CONTAINS_STANDARD_PROPERTY]->(spc);
         seen_standard_entities = set()
 
         for db_name, tables_data in db_data.items():
-            for table_name in tables_data.keys():
+            for table_name in tables_data:
                 standard_entity = table_name.lower()
                 if standard_entity not in seen_standard_entities:
                     seen_standard_entities.add(standard_entity)

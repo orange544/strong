@@ -1,26 +1,39 @@
-# src/storage/ipfs_client.py
+﻿# src/storage/ipfs_client.py
 import json
 from typing import Any
+
 import requests
 
 from src.configs.config import IPFS_API_URL, IPFS_HTTP_TIMEOUT_SEC
 
+__all__ = ["IPFSClient", "requests"]
+
+
+def _extract_cid(result: object) -> str:
+    if not isinstance(result, dict):
+        raise RuntimeError("IPFS add response must be a JSON object")
+    raw_cid = result.get("Hash")
+    if not isinstance(raw_cid, str) or not raw_cid.strip():
+        raise RuntimeError("IPFS add response missing non-empty 'Hash'")
+    return raw_cid.strip()
+
 
 class IPFSClient:
     """
-    与 IPFS 通信的客户端：
-    - 不关心 LLM / KG / 数据库，只处理：Python 对象 <-> JSON <-> CID
+    Minimal IPFS HTTP client used by the pipeline.
+    It handles only object/file <-> CID operations and stays decoupled
+    from LLM/KG logic.
     """
 
     def __init__(self, api_url: str = IPFS_API_URL, timeout: int = IPFS_HTTP_TIMEOUT_SEC):
         self.api_url = api_url.rstrip("/")
         self.timeout = timeout
 
-    # ---------- JSON 对象上传/下载 ----------
+    # JSON object upload/download
 
     def add_json(self, obj: Any) -> str:
         """
-        将 Python 对象作为 JSON 上传到 IPFS，返回 CID (Hash)
+        Upload a Python object as JSON and return the resulting CID.
         """
         data = json.dumps(obj, ensure_ascii=False).encode("utf-8")
         files = {"file": ("data.json", data)}
@@ -28,60 +41,60 @@ class IPFSClient:
         resp = requests.post(
             f"{self.api_url}/add",
             files=files,
-            timeout=self.timeout
+            timeout=self.timeout,
         )
         resp.raise_for_status()
 
         result = resp.json()
-        cid = result["Hash"]
-        print(f"已上传IPFS，CID = {cid}")
+        cid = _extract_cid(result)
+        print(f"[IPFS] Uploaded JSON, CID={cid}")
         return cid
 
     def cat_json(self, cid: str) -> Any:
         """
-        根据 CID 从 IPFS 拉取 JSON，并反序列化为 Python 对象
+        Fetch JSON content by CID and deserialize to a Python object.
         """
         params = {"arg": cid}
         resp = requests.post(
             f"{self.api_url}/cat",
             params=params,
-            timeout=self.timeout
+            timeout=self.timeout,
         )
         resp.raise_for_status()
         text = resp.text
         obj = json.loads(text)
-        print(f"IPFS内容已获取，CID = {cid}")
+        print(f"[IPFS] Fetched JSON, CID={cid}")
         return obj
 
-    # ---------- 文件上传（可选） ----------
+    # File upload/download
 
     def add_file(self, filepath: str) -> str:
         """
-        上传一个本地文件到 IPFS，返回 CID
+        Upload a local file and return the resulting CID.
         """
         with open(filepath, "rb") as f:
             files = {"file": (filepath, f)}
             resp = requests.post(
                 f"{self.api_url}/add",
                 files=files,
-                timeout=self.timeout
+                timeout=self.timeout,
             )
             resp.raise_for_status()
             result = resp.json()
-            cid = result["Hash"]
-            print(f"[IPFS] 已上传文件 {filepath}，CID = {cid}")
+            cid = _extract_cid(result)
+            print(f"[IPFS] Uploaded file: {filepath}, CID={cid}")
             return cid
 
     def cat_raw(self, cid: str) -> bytes:
         """
-        拉取原始字节（如果以后你要存二进制，比如模型文件）
+        Fetch raw bytes by CID.
         """
         params = {"arg": cid}
         resp = requests.post(
             f"{self.api_url}/cat",
             params=params,
-            timeout=self.timeout
+            timeout=self.timeout,
         )
         resp.raise_for_status()
-        print(f"[IPFS] 已获取原始数据，CID = {cid}")
+        print(f"[IPFS] Fetched raw content, CID={cid}")
         return resp.content

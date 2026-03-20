@@ -30,6 +30,7 @@ def test_load_dotenv_file_parses_lines_and_does_not_override_existing_env(
             [
                 "# comment",
                 "NO_EQUALS_LINE",
+                "=value_should_be_ignored",
                 "FOO='bar'",
                 'export BAR="baz"',
                 "EMPTY_KEY = value_should_be_ignored",
@@ -133,3 +134,23 @@ def test_ipfs_client_add_file_and_cat_raw(
     assert calls[0][1]["timeout"] == 5
     assert calls[1][1]["params"] == {"arg": "cid-add-file"}
 
+
+def test_ipfs_client_add_json_rejects_missing_hash(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def fake_post(url: str, **kwargs: Any) -> _FakeResponse:
+        del kwargs
+        if url.endswith("/add"):
+            return _FakeResponse(json_payload={})
+        raise AssertionError(f"unexpected url: {url}")
+
+    monkeypatch.setattr(ipfs_client.requests, "post", fake_post)
+
+    client = ipfs_client.IPFSClient(api_url="http://127.0.0.1:5001/api/v0")
+    with pytest.raises(RuntimeError, match="missing non-empty 'Hash'"):
+        client.add_json({"hello": "world"})
+
+
+def test_extract_cid_rejects_non_object_payload() -> None:
+    with pytest.raises(RuntimeError, match="must be a JSON object"):
+        ipfs_client._extract_cid("bad")

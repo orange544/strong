@@ -1,57 +1,46 @@
-# Repository Guidelines
+﻿# Repository Guidelines
 
 ## Project Structure & Module Organization
-- `main.py` is the primary CLI entry (`--mode sample|all`).
-- `run_domain_share.py` runs the per-domain IPFS/chain workflow.
-- Core code lives in `src/`:
-  - `configs/` environment loading and runtime defaults.
-  - `db/` SQLite sampling and schema extraction.
-  - `llm/` field description and semantic unification agents.
-  - `pipeline/` orchestration (`run.py`, `run_sampling.py`, `run_domain_share.py`, `run_auto.py`).
-  - `service/` reusable pipeline steps.
-  - `storage/` IPFS client and run registry.
-  - `kg/` Cypher generation helpers.
-- Data and outputs:
-  - SQLite inputs: `data/dbs/*.db`
-  - Generated artifacts/logs: `outputs/`
-  - Run index: `ipfs_registry.json`
+- Entry points: `main.py`, plus orchestration modules in `src/pipeline/` (`run.py`, `run_initial.py`, `run_auto.py`, `run_domain_share.py`, `run_sampling.py`).
+- Core layers under `src/`:
+  - `configs/`: environment and runtime defaults.
+  - `db/`: database access and plugin registry (`plugin_registry.py`).
+  - `llm/`: description and semantic agents.
+  - `service/`: reusable pipeline stage wrappers.
+  - `kg/`: Cypher generation.
+  - `storage/`: IPFS client and run registry.
+- Tests live in `tests/unit/` and `tests/contracts/`.
 
 ## Build, Test, and Development Commands
-- Create environment and install minimal dependencies:
-  - `python -m venv .venv`
-  - `.venv\Scripts\activate`
-  - `pip install openai requests`
-- Run sampling only: `python main.py --mode sample`
-- Run sampling and upload to IPFS: `python main.py --mode sample --upload-ipfs`
-- Run full pipeline: `python main.py --mode all`
-- Run domain-share debug flow: `python run_domain_share.py --domain IMDB --mock-llm --skip-chain --max-fields-per-domain 10`
-- Quick syntax smoke test: `python -m compileall src main.py run_domain_share.py`
+- Install/manage env with `uv` (recommended): `uv sync`.
+- Lint: `uv run ruff check src tests`.
+- Type check: `uv run mypy --explicit-package-bases src tests`.
+- Unit tests with coverage gate:  
+  `uv run pytest --cov=src --cov-report=term --cov-fail-under=80 -q`.
+- Run pipelines locally:
+  - `python main.py --mode sample`
+  - `python main.py --mode all`
 
 ## Coding Style & Naming Conventions
-- Target Python 3.12+ style with 4-space indentation and PEP 8 naming.
-- Use `snake_case` for functions/files/variables and `PascalCase` for classes.
-- Keep type hints on public functions and return structured `dict` artifacts for pipeline stages.
-- Keep orchestration in `src/pipeline/` and reusable logic in `src/service/` or lower-level modules.
-- Prefer config from `.env` (`src/configs/config.py`) over hard-coded paths or credentials.
+- Python 3.12+, 4-space indentation, PEP 8 naming.
+- Keep strict typing; avoid `Any` unless unavoidable at external boundaries.
+- Validate external inputs early (env/IPFS/LLM payloads) and raise explicit `RuntimeError` messages.
+- Keep orchestration in `src/pipeline/`; reusable business logic belongs in `src/service/` or lower layers.
 
 ## Testing Guidelines
-- There is no dedicated `tests/` suite in this snapshot; use script-level smoke tests before PRs.
-- Minimum validation for changes:
-  - run the relevant CLI command(s),
-  - confirm new JSON artifacts are written under `outputs/`,
-  - verify no traceback in logs.
-- For new logic-heavy code, add `pytest` tests under `tests/` named `test_<module>.py`.
+- Add focused unit tests in `tests/unit/test_<module>_guards.py` for edge/error paths.
+- Cover at least 3 edge cases per changed flow (invalid shape, empty value, unexpected return type).
+- Keep global coverage gate enabled (`--cov-fail-under=80`); current project baseline is much higher, so avoid regressions.
 
 ## Commit & Pull Request Guidelines
-- Git metadata is not present in this workspace, so historical commit conventions cannot be verified here.
-- Use short, imperative, scoped commit messages (example: `pipeline: add domain filter guard`).
+- Use imperative, scoped commit messages, e.g. `run_auto: validate timestamp token`.
 - PRs should include:
-  - what changed and why,
-  - related issue/task ID,
-  - commands run for validation,
-  - notable `.env` keys or runtime prerequisites.
+  - changed modules and compatibility impact,
+  - commands run (ruff/mypy/pytest),
+  - env/config changes (`.env` keys, plugin settings).
 
 ## Security & Configuration Tips
-- Do not commit real API keys, RPC endpoints, or private chain credentials.
-- Keep secrets in `.env`; rotate keys if logs accidentally expose them.
-- Avoid committing large generated logs/artifacts unless required for reproducibility.
+- Never commit real API keys, chain credentials, or private endpoints.
+- For new database support, extend `DatabasePlugin` and register via `DatabasePluginRegistry`; do not hardcode driver logic in pipelines.
+- Keep compatibility wrappers (`src/service/*` and pipeline wrapper guards) as stable boundaries; deprecate only after replacement paths are fully tested and documented.
+- Treat timestamp/file tokens and external payloads as untrusted input.

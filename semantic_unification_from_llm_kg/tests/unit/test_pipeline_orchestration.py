@@ -23,6 +23,7 @@ import src.pipeline.run_sampling as run_sampling
 import src.service.semantic_service as semantic_service
 from src.db.database_agent import DatabaseAgent
 from src.db.plugin_registry import DatabasePluginRegistry, DatabaseSource
+from src.db.unified.field_unit import FieldUnit
 
 
 class FakeDatabaseAgent:
@@ -151,7 +152,6 @@ def test_run_all_uses_full_orchestration_path(
         "load_db_sources_from_env",
         lambda *, legacy_db_paths: _make_sources({"ONE": "db1", "TWO": "db2"}),
     )
-    monkeypatch.setattr(pipeline_run, "_new_registry", lambda: FakeRegistry())
     monkeypatch.setattr(
         pipeline_run,
         "PIPELINE_CONFIG",
@@ -181,24 +181,44 @@ def test_run_all_uses_full_orchestration_path(
     monkeypatch.setattr(pipeline_run, "IPFSClient", lambda: fake_ipfs)
     monkeypatch.setattr(pipeline_run, "save_json", _make_save_json(tmp_path / "outputs"))
     monkeypatch.setattr(pipeline_run, "append_run_record", lambda record: captured_records.append(record))
-
-    def fake_get_all_fields(agent: FakeDatabaseAgent) -> list[dict[str, Any]]:
-        if agent.db_path == "db1":
-            return [
-                {"table": "movie", "field": "name", "samples": ["A"]},
-            ]
-        return [
-            {"table": "movie", "field": "id", "samples": [1]},
-            {"table": "credits", "field": "movie_id", "samples": [1]},
-        ]
-
-    monkeypatch.setattr(pipeline_run, "get_all_fields", fake_get_all_fields)
     monkeypatch.setattr(
         pipeline_run,
-        "generate_db_data",
-        lambda _agents: {
-            "ONE": {"movie": ["name"]},
-            "TWO": {"movie": ["id"], "credits": ["movie_id"]},
+        "extract_field_units_by_source",
+        lambda _sources, *, max_fields_per_domain=0: {
+            "ONE": [
+                FieldUnit(
+                    source_name="ONE",
+                    database_type="sqlite",
+                    container_name="movie",
+                    field_path="name",
+                    original_field="name",
+                    field_origin="column",
+                    logical_type="TEXT",
+                    samples=("A",),
+                )
+            ],
+            "TWO": [
+                FieldUnit(
+                    source_name="TWO",
+                    database_type="sqlite",
+                    container_name="movie",
+                    field_path="id",
+                    original_field="id",
+                    field_origin="column",
+                    logical_type="INTEGER",
+                    samples=("1",),
+                ),
+                FieldUnit(
+                    source_name="TWO",
+                    database_type="sqlite",
+                    container_name="credits",
+                    field_path="movie_id",
+                    original_field="movie_id",
+                    field_origin="column",
+                    logical_type="INTEGER",
+                    samples=("1",),
+                ),
+            ],
         },
     )
 
@@ -241,20 +261,42 @@ def test_run_all_uses_full_orchestration_path(
             ]
 
     class FakeKnowledgeGraphAgent:
-        def generate_cypher(
+        def generate_domain_kg_cypher(
+            self,
+            run_record: dict[str, Any],
+            db_name: str,
+            tables_data: dict[str, list[str]],
+            field_descs: list[dict[str, Any]],
+            domain_unified: list[dict[str, Any]],
+        ) -> list[str]:
+            assert run_record["mode"] == "federated_multi_domain_pipeline"
+            assert db_name in {"ONE", "TWO"}
+            assert isinstance(tables_data, dict)
+            assert isinstance(field_descs, list)
+            assert isinstance(domain_unified, list)
+            return [f"MERGE (:DomainKG {{db:'{db_name}'}});"]
+
+        def generate_alignment_index(self, unified_fields: list[dict[str, Any]]) -> list[dict[str, Any]]:
+            assert len(unified_fields) == 1
+            return [
+                {
+                    "canonical_name": "global_name",
+                    "fields": unified_fields[0]["fields"],
+                }
+            ]
+
+        def generate_alignment_cypher(
             self,
             run_record: dict[str, Any],
             db_data: dict[str, dict[str, list[str]]],
-            domain_field_desc_map: dict[str, list[dict[str, Any]]],
-            domain_unified_map: dict[str, list[dict[str, Any]]],
             unified_fields: list[dict[str, Any]],
+            alignment_index: list[dict[str, Any]],
         ) -> list[str]:
-            assert run_record["mode"] == "full_pipeline_with_chain"
+            assert run_record["mode"] == "federated_multi_domain_pipeline"
             assert "ONE" in db_data and "TWO" in db_data
-            assert "ONE" in domain_field_desc_map and "TWO" in domain_field_desc_map
-            assert "ONE" in domain_unified_map and "TWO" in domain_unified_map
             assert len(unified_fields) == 1
-            return ["MERGE (:Smoke {name:'ok'});"]
+            assert len(alignment_index) == 1
+            return ["MERGE (:Align {name:'ok'});"]
 
     monkeypatch.setattr(pipeline_run, "FieldDescriptionAgent", FakeFieldDescriptionAgent)
     monkeypatch.setattr(pipeline_run, "FieldSemanticAgent", FakeFieldSemanticAgent)
@@ -264,10 +306,12 @@ def test_run_all_uses_full_orchestration_path(
 
     assert len(captured_records) == 1
     record = captured_records[0]
-    assert record["mode"] == "full_pipeline_with_chain"
+    assert record["mode"] == "federated_multi_domain_pipeline"
     assert len(record["domains"]) == 2
     assert record["unified_field_count"] == 1
-    assert record["cypher_count"] == 1
+    assert record["domain_kg_total_stmt_count"] == 2
+    assert record["alignment_count"] == 1
+    assert record["alignment_cypher_count"] == 1
     assert record["domains"][0]["db_name"] == "ONE"
     assert record["domains"][1]["db_name"] == "TWO"
 
@@ -298,12 +342,36 @@ def test_run_domain_share_happy_path_with_mock_llm(
         "load_db_sources_from_env",
         lambda *, legacy_db_paths: _make_sources({"IMDB": imdb_db, "TMDB": tmdb_db}),
     )
-    monkeypatch.setattr(domain_share, "DatabasePluginRegistry", lambda: FakeRegistry())
     monkeypatch.setattr(domain_share, "LLM_DESC_CONFIG", {"api_key": "", "base_url": "", "model_name": "desc"})
     monkeypatch.setattr(
         domain_share,
-        "_sample_fields_for_domain",
-        lambda _agent, _max_fields: [{"table": "movie", "field": "name", "samples": ["A"]}],
+        "extract_field_units_by_source",
+        lambda _sources, *, max_fields_per_domain=0: {
+            "IMDB": [
+                FieldUnit(
+                    source_name="IMDB",
+                    database_type="sqlite",
+                    container_name="movie",
+                    field_path="name",
+                    original_field="name",
+                    field_origin="column",
+                    logical_type="TEXT",
+                    samples=("A",),
+                )
+            ],
+            "TMDB": [
+                FieldUnit(
+                    source_name="TMDB",
+                    database_type="sqlite",
+                    container_name="movie",
+                    field_path="name",
+                    original_field="name",
+                    field_origin="column",
+                    logical_type="TEXT",
+                    samples=("A",),
+                )
+            ],
+        },
     )
     monkeypatch.setattr(domain_share, "_make_ipfs_client", lambda _api_url: fake_ipfs)
     monkeypatch.setattr(domain_share, "save_json", _make_save_json(tmp_path / "outputs"))
@@ -347,18 +415,55 @@ def test_run_domain_share_non_strict_collects_domain_failure(
         "load_db_sources_from_env",
         lambda *, legacy_db_paths: _make_sources({"GOOD": good_db, "BAD": bad_db}),
     )
-    monkeypatch.setattr(domain_share, "DatabasePluginRegistry", lambda: FakeRegistry())
     monkeypatch.setattr(domain_share, "LLM_DESC_CONFIG", {"api_key": "", "base_url": "", "model_name": "desc"})
     monkeypatch.setattr(domain_share, "_make_ipfs_client", lambda _api_url: fake_ipfs)
     monkeypatch.setattr(domain_share, "save_json", _make_save_json(tmp_path / "outputs"))
     monkeypatch.setattr(domain_share, "append_run_record", lambda _record: None)
-
-    def fake_sample_fields(agent: FakeDatabaseAgent, _max_fields: int) -> list[dict[str, Any]]:
-        if str(agent.db_path).endswith("bad.db"):
-            raise RuntimeError("sampling failed")
-        return [{"table": "movie", "field": "name", "samples": ["X"]}]
-
-    monkeypatch.setattr(domain_share, "_sample_fields_for_domain", fake_sample_fields)
+    monkeypatch.setattr(
+        domain_share,
+        "extract_field_units_by_source",
+        lambda _sources, *, max_fields_per_domain=0: {
+            "GOOD": [
+                FieldUnit(
+                    source_name="GOOD",
+                    database_type="sqlite",
+                    container_name="movie",
+                    field_path="name",
+                    original_field="name",
+                    field_origin="column",
+                    logical_type="TEXT",
+                    samples=("X",),
+                )
+            ],
+            "BAD": [
+                FieldUnit(
+                    source_name="BAD",
+                    database_type="sqlite",
+                    container_name="movie",
+                    field_path="broken",
+                    original_field="broken",
+                    field_origin="column",
+                    logical_type="TEXT",
+                    samples=("Y",),
+                )
+            ],
+        },
+    )
+    monkeypatch.setattr(
+        domain_share,
+        "_generate_domain_descriptions",
+        lambda *, sample_payload, mock_llm, fd_agent: (_ for _ in ()).throw(RuntimeError("sampling failed"))
+        if isinstance(sample_payload, list)
+        and sample_payload
+        and sample_payload[0].get("field") == "broken"
+        else [
+            {
+                "table": sample_payload[0]["table"],  # type: ignore[index]
+                "field": sample_payload[0]["field"],  # type: ignore[index]
+                "description": "ok",
+            }
+        ],
+    )
 
     cfg = domain_share.DomainShareConfig(
         ipfs_chain_bin=tmp_path / "ipfs-chain.exe",
@@ -392,14 +497,41 @@ def test_run_domain_share_records_failed_description_without_failing_domain(
         "load_db_sources_from_env",
         lambda *, legacy_db_paths: _make_sources({"IMDB": imdb_db}),
     )
-    monkeypatch.setattr(domain_share, "DatabasePluginRegistry", lambda: FakeRegistry())
     monkeypatch.setattr(domain_share, "LLM_DESC_CONFIG", {"api_key": "", "base_url": "", "model_name": "desc"})
     monkeypatch.setattr(
         domain_share,
-        "_sample_fields_for_domain",
-        lambda _agent, _max_fields: [
-            {"table": "movie", "field": "ok", "samples": ["A"]},
-            {"table": "movie", "field": "bad", "samples": ["B"]},
+        "extract_field_units_by_source",
+        lambda _sources, *, max_fields_per_domain=0: {
+            "IMDB": [
+                FieldUnit(
+                    source_name="IMDB",
+                    database_type="sqlite",
+                    container_name="movie",
+                    field_path="ok",
+                    original_field="ok",
+                    field_origin="column",
+                    logical_type="TEXT",
+                    samples=("A",),
+                ),
+                FieldUnit(
+                    source_name="IMDB",
+                    database_type="sqlite",
+                    container_name="movie",
+                    field_path="bad",
+                    original_field="bad",
+                    field_origin="column",
+                    logical_type="TEXT",
+                    samples=("B",),
+                ),
+            ]
+        },
+    )
+    monkeypatch.setattr(
+        domain_share,
+        "field_units_to_sample_records",
+        lambda units: [
+            {"table": unit.container_name, "field": unit.field_path, "samples": list(unit.samples)}
+            for unit in units
         ],
     )
     monkeypatch.setattr(domain_share, "_make_ipfs_client", lambda _api_url: fake_ipfs)
@@ -461,15 +593,32 @@ def test_run_domain_share_strict_raises_domain_failure(
         "load_db_sources_from_env",
         lambda *, legacy_db_paths: _make_sources({"BAD": bad_db}),
     )
-    monkeypatch.setattr(domain_share, "DatabasePluginRegistry", lambda: FakeRegistry())
     monkeypatch.setattr(domain_share, "LLM_DESC_CONFIG", {"api_key": "", "base_url": "", "model_name": "desc"})
     monkeypatch.setattr(domain_share, "_make_ipfs_client", lambda _api_url: fake_ipfs)
     monkeypatch.setattr(domain_share, "save_json", _make_save_json(tmp_path / "outputs"))
     monkeypatch.setattr(domain_share, "append_run_record", lambda _record: None)
     monkeypatch.setattr(
         domain_share,
-        "_sample_fields_for_domain",
-        lambda _agent, _max_fields: (_ for _ in ()).throw(RuntimeError("sampling failed")),
+        "extract_field_units_by_source",
+        lambda _sources, *, max_fields_per_domain=0: {
+            "BAD": [
+                FieldUnit(
+                    source_name="BAD",
+                    database_type="sqlite",
+                    container_name="movie",
+                    field_path="id",
+                    original_field="id",
+                    field_origin="column",
+                    logical_type="INTEGER",
+                    samples=("1",),
+                )
+            ]
+        },
+    )
+    monkeypatch.setattr(
+        domain_share,
+        "_generate_domain_descriptions",
+        lambda *, sample_payload, mock_llm, fd_agent: (_ for _ in ()).throw(RuntimeError("sampling failed")),
     )
 
     cfg = domain_share.DomainShareConfig(
@@ -503,15 +652,32 @@ def test_run_domain_share_strict_persists_manifest_before_raise(
         "load_db_sources_from_env",
         lambda *, legacy_db_paths: _make_sources({"BAD": bad_db}),
     )
-    monkeypatch.setattr(domain_share, "DatabasePluginRegistry", lambda: FakeRegistry())
     monkeypatch.setattr(domain_share, "LLM_DESC_CONFIG", {"api_key": "", "base_url": "", "model_name": "desc"})
     monkeypatch.setattr(domain_share, "_make_ipfs_client", lambda _api_url: fake_ipfs)
     monkeypatch.setattr(domain_share, "save_json", _make_save_json(tmp_path / "outputs"))
     monkeypatch.setattr(domain_share, "append_run_record", lambda record: captured_records.append(record))
     monkeypatch.setattr(
         domain_share,
-        "_sample_fields_for_domain",
-        lambda _agent, _max_fields: (_ for _ in ()).throw(RuntimeError("sampling failed")),
+        "extract_field_units_by_source",
+        lambda _sources, *, max_fields_per_domain=0: {
+            "BAD": [
+                FieldUnit(
+                    source_name="BAD",
+                    database_type="sqlite",
+                    container_name="movie",
+                    field_path="id",
+                    original_field="id",
+                    field_origin="column",
+                    logical_type="INTEGER",
+                    samples=("1",),
+                )
+            ]
+        },
+    )
+    monkeypatch.setattr(
+        domain_share,
+        "_generate_domain_descriptions",
+        lambda *, sample_payload, mock_llm, fd_agent: (_ for _ in ()).throw(RuntimeError("sampling failed")),
     )
 
     cfg = domain_share.DomainShareConfig(
@@ -762,14 +928,14 @@ def test_run_sampling_rejects_unsupported_database_driver(
         lambda *, legacy_db_paths: {
             "PG": DatabaseSource(
                 name="PG",
-                driver="postgres",
+                driver="pgx",
                 dsn="postgresql://user:pwd@127.0.0.1:5432/movies",
                 options={},
             )
         },
     )
 
-    with pytest.raises(RuntimeError, match="Unsupported database driver 'postgres'"):
+    with pytest.raises(RuntimeError, match="Failed to extract field units for source 'PG'"):
         run_sampling.run_sampling_only(upload_to_ipfs=False, timestamp="20260319_000000")
 
 
@@ -1428,7 +1594,46 @@ def test_run_initial_run_all_happy_path(
         "_collect_candidate_sources",
         lambda _db_folder: _make_sources({"ONE": str(one_db), "TWO": str(two_db)}),
     )
-    monkeypatch.setattr(run_initial, "DatabasePluginRegistry", lambda: FakeRegistry())
+    monkeypatch.setattr(
+        run_initial,
+        "extract_field_units_by_source",
+        lambda _sources, *, max_fields_per_domain=0: {
+            "ONE": [
+                FieldUnit(
+                    source_name="ONE",
+                    database_type="sqlite",
+                    container_name="movie",
+                    field_path="name",
+                    original_field="name",
+                    field_origin="column",
+                    logical_type="TEXT",
+                    samples=("A",),
+                )
+            ],
+            "TWO": [
+                FieldUnit(
+                    source_name="TWO",
+                    database_type="sqlite",
+                    container_name="movie",
+                    field_path="id",
+                    original_field="id",
+                    field_origin="column",
+                    logical_type="INTEGER",
+                    samples=("1",),
+                ),
+                FieldUnit(
+                    source_name="TWO",
+                    database_type="sqlite",
+                    container_name="credits",
+                    field_path="movie_id",
+                    original_field="movie_id",
+                    field_origin="column",
+                    logical_type="INTEGER",
+                    samples=("1",),
+                ),
+            ],
+        },
+    )
     monkeypatch.setattr(
         run_initial,
         "PIPELINE_CONFIG",
@@ -1443,24 +1648,6 @@ def test_run_initial_run_all_happy_path(
     monkeypatch.setattr(run_initial, "IPFSClient", lambda: fake_ipfs)
     monkeypatch.setattr(run_initial, "save_json", _make_save_json(tmp_path / "outputs"))
     monkeypatch.setattr(run_initial, "append_run_record", lambda record: captured_records.append(record))
-
-    def fake_get_all_fields(agent: FakeDatabaseAgent) -> list[dict[str, Any]]:
-        if Path(agent.db_path).name == "one.db":
-            return [{"table": "movie", "field": "name", "samples": ["A"]}]
-        return [
-            {"table": "movie", "field": "id", "samples": [1]},
-            {"table": "credits", "field": "movie_id", "samples": [1]},
-        ]
-
-    monkeypatch.setattr(run_initial, "get_all_fields", fake_get_all_fields)
-    monkeypatch.setattr(
-        run_initial,
-        "generate_db_data",
-        lambda _agents: {
-            "ONE": {"movie": ["name"]},
-            "TWO": {"movie": ["id"], "credits": ["movie_id"]},
-        },
-    )
 
     class FakeFieldDescriptionAgent:
         def __init__(self, api_key: str, base_url: str, model_name: str):
@@ -1547,7 +1734,24 @@ def test_run_initial_run_all_persists_failed_record_before_raise(
         "_collect_candidate_sources",
         lambda _db_folder: _make_sources({"BAD_STEP": str(db_file)}),
     )
-    monkeypatch.setattr(run_initial, "DatabasePluginRegistry", lambda: FakeRegistry())
+    monkeypatch.setattr(
+        run_initial,
+        "extract_field_units_by_source",
+        lambda _sources, *, max_fields_per_domain=0: {
+            "BAD_STEP": [
+                FieldUnit(
+                    source_name="BAD_STEP",
+                    database_type="sqlite",
+                    container_name="movie",
+                    field_path="id",
+                    original_field="id",
+                    field_origin="column",
+                    logical_type="INTEGER",
+                    samples=("1",),
+                )
+            ]
+        },
+    )
     monkeypatch.setattr(
         run_initial,
         "PIPELINE_CONFIG",
@@ -1562,11 +1766,30 @@ def test_run_initial_run_all_persists_failed_record_before_raise(
     monkeypatch.setattr(run_initial, "IPFSClient", lambda: fake_ipfs)
     monkeypatch.setattr(run_initial, "save_json", _make_save_json(tmp_path / "outputs"))
     monkeypatch.setattr(run_initial, "append_run_record", lambda record: captured_records.append(record))
-    monkeypatch.setattr(
-        run_initial,
-        "get_all_fields",
-        lambda _agent: (_ for _ in ()).throw(RuntimeError("sampling failed in run_initial")),
-    )
+
+    class _FakeFieldDescriptionAgent:
+        def __init__(self, api_key: str, base_url: str, model_name: str):
+            self.api_key = api_key
+            self.base_url = base_url
+            self.model_name = model_name
+
+        def generate_description(self, sample: dict[str, Any]) -> dict[str, Any]:
+            return {"table": sample["table"], "field": sample["field"], "description": "ok"}
+
+    class _FailingFieldSemanticAgent:
+        def __init__(self, api_key: str, base_url: str, model_name: str):
+            del api_key, base_url, model_name
+
+        def unify_within_domain(self, field_desc_list: list[dict[str, Any]]) -> list[dict[str, Any]]:
+            del field_desc_list
+            return []
+
+        def unify_across_domains(self, domain_items: list[dict[str, Any]]) -> list[dict[str, Any]]:
+            del domain_items
+            raise RuntimeError("sampling failed in run_initial")
+
+    monkeypatch.setattr(run_initial, "FieldDescriptionAgent", _FakeFieldDescriptionAgent)
+    monkeypatch.setattr(run_initial, "FieldSemanticAgent", _FailingFieldSemanticAgent)
 
     with pytest.raises(RuntimeError, match="sampling failed in run_initial"):
         run_initial.run_all()

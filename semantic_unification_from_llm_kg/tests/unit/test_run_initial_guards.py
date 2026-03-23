@@ -12,6 +12,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 import src.pipeline.run_initial as run_initial
 from src.db.plugin_registry import DatabaseSource
+from src.db.unified.field_unit import FieldUnit
 
 
 class _FakeDatabaseAgent:
@@ -216,6 +217,7 @@ def test_run_initial_run_all_handles_max_fields_and_none_domain_unified(
 ) -> None:
     fake_ipfs = _FakeIPFSWithNoneDomainUnified()
     captured_records: list[dict[str, Any]] = []
+    captured_max_fields: dict[str, int] = {}
     db_file = Path(_create_sqlite_db(tmp_path / "one.db"))
 
     monkeypatch.setattr(
@@ -225,7 +227,27 @@ def test_run_initial_run_all_handles_max_fields_and_none_domain_unified(
             "ONE": DatabaseSource(name="ONE", driver="sqlite", dsn=str(db_file), options={})
         },
     )
-    monkeypatch.setattr(run_initial, "DatabasePluginRegistry", lambda: _FakeRegistry())
+    monkeypatch.setattr(
+        run_initial,
+        "extract_field_units_by_source",
+        lambda _sources, *, max_fields_per_domain=0: (
+            captured_max_fields.__setitem__("value", max_fields_per_domain),
+            {
+                "ONE": [
+                    FieldUnit(
+                        source_name="ONE",
+                        database_type="sqlite",
+                        container_name="movie",
+                        field_path="id",
+                        original_field="id",
+                        field_origin="column",
+                        logical_type="INTEGER",
+                        samples=("1",),
+                    )
+                ]
+            },
+        )[1],
+    )
     monkeypatch.setattr(run_initial, "IPFSClient", lambda: cast(Any, fake_ipfs))
     monkeypatch.setattr(run_initial, "save_json", _make_save_json(tmp_path / "outputs"))
     monkeypatch.setattr(
@@ -239,19 +261,6 @@ def test_run_initial_run_all_handles_max_fields_and_none_domain_unified(
     )
     monkeypatch.setattr(run_initial, "LLM_DESC_CONFIG", {"api_key": "", "base_url": "", "model_name": "desc"})
     monkeypatch.setattr(run_initial, "LLM_UNIFY_CONFIG", {"api_key": "", "base_url": "", "model_name": "unify"})
-    monkeypatch.setattr(
-        run_initial,
-        "get_all_fields",
-        lambda _agent: [
-            {"table": "movie", "field": "id", "samples": [1]},
-            {"table": "movie", "field": "title", "samples": ["A"]},
-        ],
-    )
-    monkeypatch.setattr(
-        run_initial,
-        "generate_db_data",
-        lambda _agents: {"ONE": {"movie": ["id", "title"]}},
-    )
     monkeypatch.setattr(
         run_initial,
         "_persist_run_record",
@@ -299,7 +308,7 @@ def test_run_initial_run_all_handles_max_fields_and_none_domain_unified(
             unified_fields: list[dict[str, Any]],
         ) -> list[str]:
             assert run_record["domains"][0]["sampled_field_count"] == 1
-            assert db_data["ONE"]["movie"] == ["id", "title"]
+            assert db_data["ONE"]["movie"] == ["id"]
             assert len(domain_field_desc_map["ONE"]) == 1
             # domain_unified_cid is None, should fallback to empty list branch.
             assert domain_unified_map["ONE"] == []
@@ -314,6 +323,7 @@ def test_run_initial_run_all_handles_max_fields_and_none_domain_unified(
 
     assert len(captured_records) == 1
     assert captured_records[0]["status"] == "completed"
+    assert captured_max_fields["value"] == 1
 
 
 def test_run_initial_run_all_warns_when_persist_fails_on_success(
@@ -331,7 +341,24 @@ def test_run_initial_run_all_warns_when_persist_fails_on_success(
             "ONE": DatabaseSource(name="ONE", driver="sqlite", dsn=str(db_file), options={})
         },
     )
-    monkeypatch.setattr(run_initial, "DatabasePluginRegistry", lambda: _FakeRegistry())
+    monkeypatch.setattr(
+        run_initial,
+        "extract_field_units_by_source",
+        lambda _sources, *, max_fields_per_domain=0: {
+            "ONE": [
+                FieldUnit(
+                    source_name="ONE",
+                    database_type="sqlite",
+                    container_name="movie",
+                    field_path="id",
+                    original_field="id",
+                    field_origin="column",
+                    logical_type="INTEGER",
+                    samples=("1",),
+                )
+            ]
+        },
+    )
     monkeypatch.setattr(run_initial, "IPFSClient", lambda: cast(Any, fake_ipfs))
     monkeypatch.setattr(run_initial, "save_json", _make_save_json(tmp_path / "outputs"))
     monkeypatch.setattr(
@@ -345,12 +372,6 @@ def test_run_initial_run_all_warns_when_persist_fails_on_success(
     )
     monkeypatch.setattr(run_initial, "LLM_DESC_CONFIG", {"api_key": "", "base_url": "", "model_name": "desc"})
     monkeypatch.setattr(run_initial, "LLM_UNIFY_CONFIG", {"api_key": "", "base_url": "", "model_name": "unify"})
-    monkeypatch.setattr(
-        run_initial,
-        "get_all_fields",
-        lambda _agent: [{"table": "movie", "field": "id", "samples": [1]}],
-    )
-    monkeypatch.setattr(run_initial, "generate_db_data", lambda _agents: {"ONE": {"movie": ["id"]}})
     monkeypatch.setattr(run_initial, "_persist_run_record", lambda *_args, **_kwargs: (_ for _ in ()).throw(RuntimeError("persist down")))
 
     class _FakeFieldDescriptionAgent:
@@ -409,7 +430,24 @@ def test_run_initial_run_all_warns_when_persist_fails_on_failure(
             "ONE": DatabaseSource(name="ONE", driver="sqlite", dsn=str(db_file), options={})
         },
     )
-    monkeypatch.setattr(run_initial, "DatabasePluginRegistry", lambda: _FakeRegistry())
+    monkeypatch.setattr(
+        run_initial,
+        "extract_field_units_by_source",
+        lambda _sources, *, max_fields_per_domain=0: {
+            "ONE": [
+                FieldUnit(
+                    source_name="ONE",
+                    database_type="sqlite",
+                    container_name="movie",
+                    field_path="id",
+                    original_field="id",
+                    field_origin="column",
+                    logical_type="INTEGER",
+                    samples=("1",),
+                )
+            ]
+        },
+    )
     monkeypatch.setattr(run_initial, "IPFSClient", lambda: cast(Any, _FakeIPFSWithNoneDomainUnified()))
     monkeypatch.setattr(run_initial, "save_json", _make_save_json(tmp_path / "outputs"))
     monkeypatch.setattr(
@@ -423,14 +461,33 @@ def test_run_initial_run_all_warns_when_persist_fails_on_failure(
     )
     monkeypatch.setattr(run_initial, "LLM_DESC_CONFIG", {"api_key": "", "base_url": "", "model_name": "desc"})
     monkeypatch.setattr(run_initial, "LLM_UNIFY_CONFIG", {"api_key": "", "base_url": "", "model_name": "unify"})
-    monkeypatch.setattr(
-        run_initial,
-        "get_all_fields",
-        lambda _agent: (_ for _ in ()).throw(RuntimeError("sampling failed")),
-    )
     monkeypatch.setattr(run_initial, "_persist_run_record", lambda *_args, **_kwargs: (_ for _ in ()).throw(RuntimeError("persist down")))
 
-    with pytest.raises(RuntimeError, match="sampling failed"):
+    class _FakeFieldDescriptionAgent:
+        def __init__(self, api_key: str, base_url: str, model_name: str):
+            self.api_key = api_key
+            self.base_url = base_url
+            self.model_name = model_name
+
+        def generate_description(self, sample: dict[str, Any]) -> dict[str, Any]:
+            return {"table": sample["table"], "field": sample["field"], "description": "ok"}
+
+    class _FailingFieldSemanticAgent:
+        def __init__(self, api_key: str, base_url: str, model_name: str):
+            del api_key, base_url, model_name
+
+        def unify_within_domain(self, field_desc_list: list[dict[str, Any]]) -> list[dict[str, Any]]:
+            del field_desc_list
+            return []
+
+        def unify_across_domains(self, domain_items: list[dict[str, Any]]) -> list[dict[str, Any]]:
+            del domain_items
+            raise RuntimeError("semantic failed")
+
+    monkeypatch.setattr(run_initial, "FieldDescriptionAgent", _FakeFieldDescriptionAgent)
+    monkeypatch.setattr(run_initial, "FieldSemanticAgent", _FailingFieldSemanticAgent)
+
+    with pytest.raises(RuntimeError, match="semantic failed"):
         run_initial.run_all()
     output = capsys.readouterr().out
     assert "[warn] failed to persist failed run record: persist down" in output

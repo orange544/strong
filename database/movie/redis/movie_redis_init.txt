@@ -1,0 +1,64 @@
+﻿# Redis key structure design for movie domain.
+# This file defines key naming conventions and command templates with placeholders.
+# Replace placeholders before execution.
+
+# 1) Movie basic snapshot (hash)
+# Key: movie:basic:{movie_id}
+# Fields: movie_id, name, imdb_id, douban_score, douban_votes, release_date, year, genres, tags
+HSET movie:basic:{movie_id} \
+  movie_id {movie_id} \
+  name {name} \
+  imdb_id {imdb_id} \
+  douban_score {douban_score} \
+  douban_votes {douban_votes} \
+  release_date {release_date} \
+  year {year} \
+  genres {genres} \
+  tags {tags}
+
+# 2) Hot movie ranking (zset)
+# Key: movie:hot:rank
+# Member: movie_id, Score: hot_score
+ZADD movie:hot:rank {hot_score} {movie_id}
+
+# 3) Schedule seat status (hash)
+# Key: schedule:seat:status:{schedule_id}
+# Field: seat_id, Value: seat_status
+HSET schedule:seat:status:{schedule_id} {seat_id} {seat_status}
+
+# 4) Pending order cache (hash)
+# Key: order:pending:{order_id}
+# Fields: order_id, user_id, schedule_id, order_status, expire_time
+HSET order:pending:{order_id} \
+  order_id {order_id} \
+  user_id {user_id} \
+  schedule_id {schedule_id} \
+  order_status {order_status} \
+  expire_time {expire_time}
+
+# 5) Payment status cache (hash)
+# Key: payment:status:{order_id}
+# Fields: order_id, payment_status, payment_time, payment_channel
+HSET payment:status:{order_id} \
+  order_id {order_id} \
+  payment_status {payment_status} \
+  payment_time {payment_time} \
+  payment_channel {payment_channel}
+
+# 6) User session (hash)
+# Key: user:session:{user_md5}
+# Fields: user_md5, user_nickname, last_access_time
+HSET user:session:{user_md5} \
+  user_md5 {user_md5} \
+  user_nickname {user_nickname} \
+  last_access_time {last_access_time}
+
+# 7) Temporary recommendation result (zset)
+# Key: recommend:temp:{user_md5}
+# Member: movie_id, Score: recommend_score
+ZADD recommend:temp:{user_md5} {recommend_score} {movie_id}
+
+# 8) Query result cache (set)
+# Key: query:result:{query_key}
+# Member: movie_id
+SADD query:result:{query_key} {movie_id}

@@ -8,7 +8,17 @@ version = "0.1.0"
 description = "Semantic unification pipeline across heterogeneous databases with LLM, IPFS, and chain integration."
 requires-python = ">=3.12,<3.13"
 dependencies = [
+  "cassandra-driver>=3.29.3",
+  "clickhouse-driver>=0.2.9",
+  "gevent>=25.9.1",
+  "happybase>=1.3.0",
+  "neo4j>=6.1.0",
   "openai>=1.75.0,<2.0.0",
+  "oracledb>=2.5.1",
+  "psycopg[binary]>=3.2.10",
+  "pymysql>=1.1.1",
+  "pymongo>=4.16.0",
+  "redis>=7.3.0",
   "requests>=2.32.0,<3.0.0",
 ]
 

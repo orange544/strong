@@ -35,6 +35,19 @@ def _as_optional_float(name: str, default: float) -> float | None:
     return value
 
 
+def _as_bool(name: str, default: bool) -> bool:
+    raw = os.getenv(name)
+    if raw is None:
+        return default
+
+    normalized = raw.strip().lower()
+    if normalized in {"1", "true", "yes", "on"}:
+        return True
+    if normalized in {"0", "false", "no", "off"}:
+        return False
+    return default
+
+
 def _load_db_paths() -> dict[str, str]:
     raw_json = os.getenv("DB_PATHS_JSON", "").strip()
     if raw_json:
@@ -116,6 +129,10 @@ PIPELINE_CONFIG = {
     "llm_desc_max_workers": max(1, _as_int("LLM_DESC_MAX_WORKERS", 1)),
     "llm_desc_domain_timeout_sec": max(30, _as_int("LLM_DESC_DOMAIN_TIMEOUT", 900)),
     "run_max_fields_per_domain": max(0, _as_int("RUN_MAX_FIELDS_PER_DOMAIN", 0)),
+    "run_preflight_enabled": _as_bool("RUN_PREFLIGHT_ENABLED", True),
+    "run_preflight_check_sqlite_path": _as_bool("RUN_PREFLIGHT_CHECK_SQLITE_PATH", True),
+    "run_preflight_check_tcp": _as_bool("RUN_PREFLIGHT_CHECK_TCP", False),
+    "run_preflight_tcp_timeout_sec": max(0.2, _as_float("RUN_PREFLIGHT_TCP_TIMEOUT_SEC", 2.0)),
 }
 
 

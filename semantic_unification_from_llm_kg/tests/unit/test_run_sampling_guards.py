@@ -11,6 +11,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 import src.pipeline.run_sampling as run_sampling
 from src.db.plugin_registry import DatabaseSource
+from src.db.unified.field_unit import FieldUnit
 
 
 class _FakeAgent:
@@ -89,24 +90,25 @@ def test_run_sampling_only_uploads_to_ipfs_when_enabled(
 
     source = DatabaseSource(name="ONE", driver="sqlite", dsn=str(db_file), options={})
     fake_ipfs = _FakeIPFS()
-    created_agents: list[_FakeAgent] = []
-
-    class _LocalRegistry:
-        def create_agent(self, source_obj: DatabaseSource) -> _FakeAgent:
-            del source_obj
-            agent = _FakeAgent()
-            created_agents.append(agent)
-            return agent
-
-        def supported_drivers(self) -> tuple[str, ...]:
-            return ("sqlite",)
 
     monkeypatch.setattr(run_sampling, "_load_runtime_db_sources", lambda: {"ONE": source})
-    monkeypatch.setattr(run_sampling, "DatabasePluginRegistry", lambda: cast(Any, _LocalRegistry()))
     monkeypatch.setattr(
         run_sampling,
-        "get_all_fields",
-        lambda _agent: [{"table": "movie", "field": "id", "samples": [1]}],
+        "extract_field_units_by_source",
+        lambda _sources: {
+            "ONE": [
+                FieldUnit(
+                    source_name="ONE",
+                    database_type="sqlite",
+                    container_name="movie",
+                    field_path="id",
+                    original_field="id",
+                    field_origin="column",
+                    logical_type="INTEGER",
+                    samples=("1",),
+                )
+            ]
+        },
     )
     monkeypatch.setattr(run_sampling, "save_json", lambda _data, _name: str(tmp_path / "samples.json"))
     monkeypatch.setattr(run_sampling, "IPFSClient", lambda: cast(Any, fake_ipfs))
@@ -117,4 +119,3 @@ def test_run_sampling_only_uploads_to_ipfs_when_enabled(
     assert isinstance(result["databases"], dict)
     assert cast(dict[str, int], result["databases"])["ONE"] == 1
     assert len(fake_ipfs.uploaded) == 1
-    assert created_agents[0].closed is True

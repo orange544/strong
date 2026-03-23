@@ -3,11 +3,15 @@ from __future__ import annotations
 from datetime import datetime
 
 from src.configs.config import DB_PATHS
-from src.db.database_agent import DatabaseAgent, get_all_fields
+from src.db.database_agent import get_all_fields  # compatibility export
 from src.db.plugin_registry import (
-    DatabasePluginRegistry,
+    DatabasePluginRegistry,  # compatibility export
     DatabaseSource,
     load_db_sources_from_env,
+)
+from src.pipeline.unified_interface import (
+    extract_field_units_by_source,
+    field_units_to_sample_records,
 )
 from src.storage.ipfs_client import IPFSClient
 from src.utils.io import save_json
@@ -28,20 +32,6 @@ def _load_runtime_db_sources() -> dict[str, DatabaseSource]:
     return normalized
 
 
-def _create_agent_for_source(
-    registry: DatabasePluginRegistry,
-    source: DatabaseSource,
-) -> DatabaseAgent:
-    try:
-        return registry.create_agent(source)
-    except KeyError as exc:
-        supported = ", ".join(registry.supported_drivers()) or "<none>"
-        raise RuntimeError(
-            f"Unsupported database driver '{source.driver}' for source '{source.name}'. "
-            f"Supported drivers: {supported}"
-        ) from exc
-
-
 def run_sampling_only(
     *,
     upload_to_ipfs: bool = False,
@@ -54,19 +44,13 @@ def run_sampling_only(
     if not db_sources:
         raise RuntimeError("No database sources configured. Set DB_SOURCES_JSON or DB_PATHS.")
 
-    registry = DatabasePluginRegistry()
+    field_units_by_source = extract_field_units_by_source(db_sources)
+
     all_samples: list[dict[str, object]] = []
     db_stats: dict[str, int] = {}
     for db_name, source in db_sources.items():
         print(f"[Sampling] {db_name} [{source.driver}] -> {source.dsn}")
-        agent = _create_agent_for_source(registry, source)
-        try:
-            samples = get_all_fields(agent)
-        finally:
-            agent.close()
-
-        for item in samples:
-            item["db_name"] = db_name
+        samples = field_units_to_sample_records(field_units_by_source[db_name])
         all_samples.extend(samples)
         db_stats[db_name] = len(samples)
 

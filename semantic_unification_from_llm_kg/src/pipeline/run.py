@@ -14,12 +14,12 @@ from src.configs.config import (
     LLM_UNIFY_CONFIG,
     PIPELINE_CONFIG,
 )
-from src.db.database_agent import generate_db_data, get_all_fields
 from src.db.plugin_registry import (
     DatabasePluginRegistry,
     DatabaseSource,
     load_db_sources_from_env,
 )
+from src.db.unified.preflight import run_preflight_checks
 from src.kg.kg_agent import KnowledgeGraphAgent
 from src.llm.description_agent import FieldDescriptionAgent
 from src.llm.semantic import FieldSemanticAgent
@@ -37,6 +37,11 @@ from src.pipeline.orchestration_common import (
 )
 from src.pipeline.orchestration_common import (
     wrap_single_table_fields_for_cross_domain as _wrap_single_table_fields_for_cross_domain,
+)
+from src.pipeline.unified_interface import (
+    build_db_data_from_field_units,
+    extract_field_units_by_source,
+    field_units_to_sample_records,
 )
 from src.storage.ipfs_client import IPFSClient
 from src.storage.registry import append_run_record
@@ -75,6 +80,38 @@ def _domain_share_timeout_sec() -> int:
         except ValueError as exc:
             raise RuntimeError("DOMAIN_SHARE_DEFAULTS['timeout_sec'] must be an integer") from exc
     raise RuntimeError("DOMAIN_SHARE_DEFAULTS['timeout_sec'] must be an integer")
+
+
+def _pipeline_bool(key: str, default: bool) -> bool:
+    raw = PIPELINE_CONFIG.get(key, default)
+    if isinstance(raw, bool):
+        return raw
+    if isinstance(raw, int):
+        return raw != 0
+    if isinstance(raw, str):
+        normalized = raw.strip().lower()
+        if normalized in {"1", "true", "yes", "on"}:
+            return True
+        if normalized in {"0", "false", "no", "off"}:
+            return False
+    raise RuntimeError(f"PIPELINE_CONFIG['{key}'] must be a bool-like value")
+
+
+def _pipeline_positive_float(key: str, default: float) -> float:
+    raw = PIPELINE_CONFIG.get(key, default)
+    if isinstance(raw, int | float):
+        value = float(raw)
+    elif isinstance(raw, str):
+        try:
+            value = float(raw.strip())
+        except ValueError as exc:
+            raise RuntimeError(f"PIPELINE_CONFIG['{key}'] must be a float") from exc
+    else:
+        raise RuntimeError(f"PIPELINE_CONFIG['{key}'] must be a float")
+
+    if value <= 0:
+        raise RuntimeError(f"PIPELINE_CONFIG['{key}'] must be positive")
+    return value
 
 
 def _ensure_ipfs_chain_binary(binary_path: Path, go_norn_root: Path | None) -> None:
@@ -211,13 +248,35 @@ def run_all() -> None:
     if not db_sources:
         raise RuntimeError("No database sources configured. Set DB_SOURCES_JSON or DB_PATHS.")
 
-    db_agents = _create_db_agents(db_sources, _new_registry())
-    ipfs = IPFSClient()
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    preflight_enabled = _pipeline_bool("run_preflight_enabled", True)
+    if preflight_enabled:
+        preflight_check_sqlite = _pipeline_bool("run_preflight_check_sqlite_path", False)
+        preflight_check_tcp = _pipeline_bool("run_preflight_check_tcp", False)
+        preflight_tcp_timeout_sec = _pipeline_positive_float(
+            "run_preflight_tcp_timeout_sec",
+            2.0,
+        )
+        run_preflight_checks(
+            db_sources,
+            check_sqlite_path=preflight_check_sqlite,
+            check_tcp=preflight_check_tcp,
+            tcp_timeout_sec=preflight_tcp_timeout_sec,
+        )
+        print(
+            "[Preflight] passed "
+            f"(sqlite_path={preflight_check_sqlite}, tcp={preflight_check_tcp})"
+        )
 
     max_workers = PIPELINE_CONFIG["llm_desc_max_workers"]
     domain_timeout_sec = PIPELINE_CONFIG["llm_desc_domain_timeout_sec"]
     max_fields_per_domain = PIPELINE_CONFIG["run_max_fields_per_domain"]
+    domain_field_units = extract_field_units_by_source(
+        db_sources,
+        max_fields_per_domain=max_fields_per_domain,
+    )
+
+    ipfs = IPFSClient()
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
     ipfs_chain_bin = Path(_domain_share_required_str("ipfs_chain_bin"))
     go_norn_root_value = _domain_share_optional_str("go_norn_root")
@@ -230,7 +289,7 @@ def run_all() -> None:
 
     run_record: dict[str, Any] = {
         "timestamp": timestamp,
-        "mode": "full_pipeline_with_chain",
+        "mode": "federated_multi_domain_pipeline",
         "databases": list(db_sources.keys()),
         "llm_desc_model": LLM_DESC_CONFIG["model_name"],
         "llm_unify_model": LLM_UNIFY_CONFIG["model_name"],
@@ -238,16 +297,13 @@ def run_all() -> None:
     }
 
     try:
+        # =========================================================
         # Step 1: per-domain sampling -> IPFS -> chain
-        for db_name, agent in db_agents.items():
+        # =========================================================
+        for db_name in db_sources:
             db_tag = _safe_db_tag(db_name)
             print(f"sampling database: {db_name}")
-            samples = get_all_fields(agent)
-            if max_fields_per_domain > 0:
-                samples = samples[:max_fields_per_domain]
-
-            for sample in samples:
-                sample["db_name"] = db_name
+            samples = field_units_to_sample_records(domain_field_units[db_name])
 
             sample_artifact = _build_sample_artifact(db_name, timestamp, samples)
             sample_filename = f"samples_{db_tag}_{timestamp}.json"
@@ -282,7 +338,9 @@ def run_all() -> None:
                 }
             )
 
+        # =========================================================
         # Step 2: per-domain descriptions -> IPFS -> chain
+        # =========================================================
         fd_agent = FieldDescriptionAgent(
             api_key=LLM_DESC_CONFIG["api_key"],
             base_url=LLM_DESC_CONFIG["base_url"],
@@ -292,7 +350,6 @@ def run_all() -> None:
             f"generating descriptions with workers={max_workers}, domain_timeout={domain_timeout_sec}s"
         )
 
-        all_field_descriptions: list[dict[str, Any]] = []
         for domain_entry in run_record["domains"]:
             db_name = domain_entry["db_name"]
             db_tag = _safe_db_tag(db_name)
@@ -346,9 +403,9 @@ def run_all() -> None:
             domain_entry["description_tx_hash"] = desc_tx_hash
             domain_entry["description_count"] = len(field_descriptions)
 
-            all_field_descriptions.extend(field_descriptions)
-
+        # =========================================================
         # Step 3: two-stage semantic unification
+        # =========================================================
         fs_agent = FieldSemanticAgent(
             api_key=LLM_UNIFY_CONFIG["api_key"],
             base_url=LLM_UNIFY_CONFIG["base_url"],
@@ -375,8 +432,10 @@ def run_all() -> None:
                 domain_unified = _attach_db_name_to_domain_unified(domain_unified, db_name)
 
             domain_unified_file = f"domain_unified_{_safe_db_tag(db_name)}_{timestamp}.json"
-            save_json(domain_unified, domain_unified_file)
-            domain_unified_cid = ipfs.add_json(domain_unified)
+            domain_unified_saved_path = save_json(domain_unified, domain_unified_file)
+            domain_unified_file_path = Path(domain_unified_saved_path).resolve()
+
+            domain_unified_cid = ipfs.add_file(str(domain_unified_file_path))
 
             domain_entry["domain_unified_file"] = domain_unified_file
             domain_entry["domain_unified_cid"] = domain_unified_cid
@@ -387,14 +446,17 @@ def run_all() -> None:
         unified_fields = fs_agent.unify_across_domains(domain_level_items)
 
         uf_file = f"unified_fields_{timestamp}.json"
-        save_json(unified_fields, uf_file)
-        unified_fields_cid = ipfs.add_json(unified_fields)
+        uf_saved_path = save_json(unified_fields, uf_file)
+        uf_file_path = Path(uf_saved_path).resolve()
+        unified_fields_cid = ipfs.add_file(str(uf_file_path))
         run_record["unified_fields_file"] = uf_file
         run_record["unified_fields_cid"] = unified_fields_cid
         run_record["unified_field_count"] = len(unified_fields)
 
-        # Step 4: KG Cypher generation
-        db_data = generate_db_data(db_agents)
+        # =========================================================
+        # Step 4A: per-domain KG Cypher generation
+        # =========================================================
+        db_data = build_db_data_from_field_units(domain_field_units)
         kg_agent = KnowledgeGraphAgent()
 
         domain_field_desc_map: dict[str, list[dict[str, Any]]] = {}
@@ -410,31 +472,120 @@ def run_all() -> None:
             domain_field_desc_map[db_name] = desc_artifact.get("field_descriptions", [])
             domain_unified_map[db_name] = ipfs.cat_json(domain_entry["domain_unified_cid"])
 
-        cypher_list = kg_agent.generate_cypher(
-            run_record=run_record,
-            db_data=db_data,
-            domain_field_desc_map=domain_field_desc_map,
-            domain_unified_map=domain_unified_map,
-            unified_fields=unified_fields,
+        total_domain_kg_stmt_count = 0
+
+        for domain_entry in run_record["domains"]:
+            db_name = domain_entry["db_name"]
+            db_tag = _safe_db_tag(db_name)
+
+            domain_kg_cypher = kg_agent.generate_domain_kg_cypher(
+                run_record=run_record,
+                db_name=db_name,
+                tables_data=db_data.get(db_name, {}),
+                field_descs=domain_field_desc_map.get(db_name, []),
+                domain_unified=domain_unified_map.get(db_name, []),
+            )
+
+            domain_kg_file = f"domain_kg_cypher_{db_tag}_{timestamp}.json"
+            domain_kg_saved_path = save_json(domain_kg_cypher, domain_kg_file)
+            domain_kg_file_path = Path(domain_kg_saved_path).resolve()
+
+            domain_kg_cid = ipfs.add_file(str(domain_kg_file_path))
+            print(f"[IPFS] domain kg CID = {domain_kg_cid}")
+
+            domain_kg_chain_key = f"REGISTER_DOMAIN_KG:{db_tag}_{timestamp}"
+            domain_kg_chain_cid, domain_kg_tx_hash = _put_file_on_chain(
+                ipfs_chain_bin=ipfs_chain_bin,
+                receiver=chain_receiver,
+                key=domain_kg_chain_key,
+                file_path=domain_kg_file_path,
+                rpc_addr=chain_rpc_addr,
+                ipfs_api=chain_ipfs_api,
+                timeout_sec=chain_timeout_sec,
+            )
+            print(f"[CHAIN] domain kg TxHash = {domain_kg_tx_hash}")
+
+            domain_entry["domain_kg_file"] = domain_kg_file
+            domain_entry["domain_kg_cid"] = domain_kg_cid
+            domain_entry["domain_kg_chain_key"] = domain_kg_chain_key
+            domain_entry["domain_kg_chain_cid"] = domain_kg_chain_cid
+            domain_entry["domain_kg_tx_hash"] = domain_kg_tx_hash
+            domain_entry["domain_kg_stmt_count"] = len(domain_kg_cypher)
+
+            total_domain_kg_stmt_count += len(domain_kg_cypher)
+
+        # =========================================================
+        # Step 4B: alignment index + alignment cypher
+        # =========================================================
+        alignment_index = kg_agent.generate_alignment_index(unified_fields)
+
+        alignment_index_file = f"alignment_index_{timestamp}.json"
+        alignment_index_saved_path = save_json(alignment_index, alignment_index_file)
+        alignment_index_file_path = Path(alignment_index_saved_path).resolve()
+
+        alignment_index_cid = ipfs.add_file(str(alignment_index_file_path))
+        alignment_chain_key = f"REGISTER_ALIGNMENT_INDEX:{timestamp}"
+        alignment_chain_cid, alignment_tx_hash = _put_file_on_chain(
+            ipfs_chain_bin=ipfs_chain_bin,
+            receiver=chain_receiver,
+            key=alignment_chain_key,
+            file_path=alignment_index_file_path,
+            rpc_addr=chain_rpc_addr,
+            ipfs_api=chain_ipfs_api,
+            timeout_sec=chain_timeout_sec,
         )
 
-        cypher_file = f"cypher_{timestamp}.json"
-        save_json(cypher_list, cypher_file)
-        cypher_cid = ipfs.add_json(cypher_list)
-        run_record["cypher_file"] = cypher_file
-        run_record["cypher_cid"] = cypher_cid
-        run_record["cypher_count"] = len(cypher_list)
+        run_record["alignment_index_file"] = alignment_index_file
+        run_record["alignment_index_cid"] = alignment_index_cid
+        run_record["alignment_chain_key"] = alignment_chain_key
+        run_record["alignment_chain_cid"] = alignment_chain_cid
+        run_record["alignment_tx_hash"] = alignment_tx_hash
+        run_record["alignment_count"] = len(alignment_index)
 
+        alignment_cypher = kg_agent.generate_alignment_cypher(
+            run_record=run_record,
+            db_data=db_data,
+            unified_fields=unified_fields,
+            alignment_index=alignment_index,
+        )
+
+        alignment_cypher_file = f"alignment_cypher_{timestamp}.json"
+        alignment_cypher_saved_path = save_json(alignment_cypher, alignment_cypher_file)
+        alignment_cypher_file_path = Path(alignment_cypher_saved_path).resolve()
+
+        alignment_cypher_cid = ipfs.add_file(str(alignment_cypher_file_path))
+        alignment_cypher_chain_key = f"REGISTER_ALIGNMENT_CYPHER:{timestamp}"
+        alignment_cypher_chain_cid, alignment_cypher_tx_hash = _put_file_on_chain(
+            ipfs_chain_bin=ipfs_chain_bin,
+            receiver=chain_receiver,
+            key=alignment_cypher_chain_key,
+            file_path=alignment_cypher_file_path,
+            rpc_addr=chain_rpc_addr,
+            ipfs_api=chain_ipfs_api,
+            timeout_sec=chain_timeout_sec,
+        )
+
+        run_record["alignment_cypher_file"] = alignment_cypher_file
+        run_record["alignment_cypher_cid"] = alignment_cypher_cid
+        run_record["alignment_cypher_chain_key"] = alignment_cypher_chain_key
+        run_record["alignment_cypher_chain_cid"] = alignment_cypher_chain_cid
+        run_record["alignment_cypher_tx_hash"] = alignment_cypher_tx_hash
+        run_record["alignment_cypher_count"] = len(alignment_cypher)
+
+        run_record["domain_kg_total_stmt_count"] = total_domain_kg_stmt_count
+
+        # =========================================================
         # Step 5: registry
+        # =========================================================
         append_run_record(run_record)
 
         print("\nrun summary:")
         pprint(run_record)
-        print(f"generated cypher count: {len(cypher_list)}")
-
+        print(f"generated domain kg stmt count: {total_domain_kg_stmt_count}")
+        print(f"generated alignment stmt count: {len(alignment_cypher)}")
     finally:
-        for agent in db_agents.values():
-            agent.close()
+        # Unified adapters are stateless; keep explicit finally for structure parity.
+        pass
 
 
 def run_pipeline() -> None:

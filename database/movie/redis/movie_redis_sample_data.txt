@@ -1,0 +1,90 @@
+﻿DEL movie:hot:rank
+DEL hot_movies:35267208 hot_movies:36779979 hot_movies:90000001 hot_movies:90000002 hot_movies:25845392 hot_movies:90000003 hot_movies:30474725 hot_movies:34780991 hot_movies:90000004 hot_movies:34841067
+DEL movie:detail:35267208 movie:detail:36779979 movie:detail:90000001 movie:detail:90000002 movie:detail:25845392 movie:detail:90000003 movie:detail:30474725 movie:detail:34780991 movie:detail:90000004 movie:detail:34841067
+DEL query:cache:movie:keyword:kehuan query:cache:movie:keyword:sport query:cache:movie:keyword:oscars query:cache:movie:keyword:spring_festival query:cache:movie:keyword:action
+DEL user:session:0ab7e3efacd56983f16503572d2b9915 user:session:5f4dcc3b5aa765d61d8327deb882cf99 user:session:9e107d9d372bb6826bd81d3542a419d6 user:session:e10adc3949ba59abbe56e057f20f883e user:session:25d55ad283aa400af464c76d713c07ad user:session:d8578edf8458ce06fbc5bb76a58c5ca4 user:session:96e79218965eb72c92a549dd5a330112 user:session:6cb75f652a9b52798eb6cf2201057c73 user:session:c33367701511b4f6020ec61ded352059 user:session:b59c67bf196a4758191e42f76670ceba
+DEL rec:user:0ab7e3efacd56983f16503572d2b9915 rec:user:5f4dcc3b5aa765d61d8327deb882cf99 rec:user:9e107d9d372bb6826bd81d3542a419d6 rec:user:e10adc3949ba59abbe56e057f20f883e rec:user:25d55ad283aa400af464c76d713c07ad
+DEL movie:comment:summary:35267208 movie:comment:summary:36779979 movie:comment:summary:90000001 movie:comment:summary:90000002 movie:comment:summary:25845392 movie:comment:summary:90000003 movie:comment:summary:30474725 movie:comment:summary:34780991 movie:comment:summary:90000004 movie:comment:summary:34841067
+
+HSET hot_movies:35267208 movie_id 35267208 name 流浪地球2 alias The_Wandering_Earth_II imdb_id tt13539646 douban_score 8.3 douban_votes 1325089 hot_score 98.8 stat_date 2026-03-23 source clickhouse.movie_popularity_trend cached_at 2026-03-23T19:20:00+08:00
+HSET hot_movies:36779979 movie_id 36779979 name 热辣滚烫 alias YOLO imdb_id tt30953582 douban_score 7.8 douban_votes 864122 hot_score 97.6 stat_date 2026-03-23 source clickhouse.movie_popularity_trend cached_at 2026-03-23T19:20:00+08:00
+HSET hot_movies:90000001 movie_id 90000001 name 奥本海默 alias Oppenheimer imdb_id tt15398776 douban_score 8.8 douban_votes 1054321 hot_score 97.2 stat_date 2026-03-23 source clickhouse.movie_popularity_trend cached_at 2026-03-23T19:20:00+08:00
+HSET hot_movies:90000002 movie_id 90000002 name 沙丘2 alias Dune_Part_Two imdb_id tt15239678 douban_score 8.5 douban_votes 702113 hot_score 96.7 stat_date 2026-03-23 source clickhouse.movie_popularity_trend cached_at 2026-03-23T19:20:00+08:00
+HSET hot_movies:25845392 movie_id 25845392 name 长津湖 alias The_Battle_at_Lake_Changjin imdb_id tt13462900 douban_score 7.4 douban_votes 926541 hot_score 95.8 stat_date 2026-03-23 source clickhouse.movie_popularity_trend cached_at 2026-03-23T19:20:00+08:00
+HSET hot_movies:90000003 movie_id 90000003 name 蜘蛛侠：英雄无归 alias Spider_Man_No_Way_Home imdb_id tt10872600 douban_score 8.1 douban_votes 812334 hot_score 95.0 stat_date 2026-03-23 source clickhouse.movie_popularity_trend cached_at 2026-03-23T19:20:00+08:00
+HSET hot_movies:30474725 movie_id 30474725 name 满江红 alias Full_River_Red imdb_id tt21181940 douban_score 7.0 douban_votes 1214021 hot_score 94.4 stat_date 2026-03-23 source clickhouse.movie_popularity_trend cached_at 2026-03-23T19:20:00+08:00
+HSET hot_movies:34780991 movie_id 34780991 name 封神第一部：朝歌风云 alias Creation_of_the_Gods_I imdb_id tt6979756 douban_score 7.7 douban_votes 1025683 hot_score 93.8 stat_date 2026-03-23 source clickhouse.movie_popularity_trend cached_at 2026-03-23T19:20:00+08:00
+HSET hot_movies:90000004 movie_id 90000004 name 壮志凌云2：独行侠 alias Top_Gun_Maverick imdb_id tt1745960 douban_score 8.7 douban_votes 653402 hot_score 93.2 stat_date 2026-03-23 source clickhouse.movie_popularity_trend cached_at 2026-03-23T19:20:00+08:00
+HSET hot_movies:34841067 movie_id 34841067 name 你好，李焕英 alias Hi_Mom imdb_id tt14188440 douban_score 7.7 douban_votes 1456702 hot_score 92.6 stat_date 2026-03-23 source clickhouse.movie_popularity_trend cached_at 2026-03-23T19:20:00+08:00
+
+SET movie:detail:35267208 '{"movie_id":35267208,"name":"流浪地球2","name_en":"The Wandering Earth II","imdb_id":"tt13539646","douban_score":8.3,"douban_votes":1325089,"genres":["科幻","冒险","灾难"],"languages":["汉语普通话"],"release_date":"2023-01-22","year":2023,"regions":["中国大陆"],"updated_time":"2026-03-23T19:20:00+08:00"}' EX 21600
+SET movie:detail:36779979 '{"movie_id":36779979,"name":"热辣滚烫","name_en":"YOLO","imdb_id":"tt30953582","douban_score":7.8,"douban_votes":864122,"genres":["剧情","喜剧","运动"],"languages":["汉语普通话"],"release_date":"2024-02-10","year":2024,"regions":["中国大陆"],"updated_time":"2026-03-23T19:20:00+08:00"}' EX 21600
+SET movie:detail:90000001 '{"movie_id":90000001,"name":"奥本海默","name_en":"Oppenheimer","imdb_id":"tt15398776","douban_score":8.8,"douban_votes":1054321,"genres":["剧情","传记","历史"],"languages":["英语"],"release_date":"2023-08-30","year":2023,"regions":["美国","英国"],"updated_time":"2026-03-23T19:20:00+08:00"}' EX 21600
+SET movie:detail:90000002 '{"movie_id":90000002,"name":"沙丘2","name_en":"Dune: Part Two","imdb_id":"tt15239678","douban_score":8.5,"douban_votes":702113,"genres":["科幻","动作","冒险"],"languages":["英语"],"release_date":"2024-03-08","year":2024,"regions":["美国","加拿大"],"updated_time":"2026-03-23T19:20:00+08:00"}' EX 21600
+SET movie:detail:25845392 '{"movie_id":25845392,"name":"长津湖","name_en":"The Battle at Lake Changjin","imdb_id":"tt13462900","douban_score":7.4,"douban_votes":926541,"genres":["剧情","历史","战争"],"languages":["汉语普通话"],"release_date":"2021-09-30","year":2021,"regions":["中国大陆","中国香港"],"updated_time":"2026-03-23T19:20:00+08:00"}' EX 21600
+SET movie:detail:90000003 '{"movie_id":90000003,"name":"蜘蛛侠：英雄无归","name_en":"Spider-Man: No Way Home","imdb_id":"tt10872600","douban_score":8.1,"douban_votes":812334,"genres":["动作","科幻","奇幻"],"languages":["英语"],"release_date":"2021-12-17","year":2021,"regions":["美国"],"updated_time":"2026-03-23T19:20:00+08:00"}' EX 21600
+SET movie:detail:30474725 '{"movie_id":30474725,"name":"满江红","name_en":"Full River Red","imdb_id":"tt21181940","douban_score":7.0,"douban_votes":1214021,"genres":["剧情","喜剧","悬疑"],"languages":["汉语普通话"],"release_date":"2023-01-22","year":2023,"regions":["中国大陆"],"updated_time":"2026-03-23T19:20:00+08:00"}' EX 21600
+SET movie:detail:34780991 '{"movie_id":34780991,"name":"封神第一部：朝歌风云","name_en":"Creation of the Gods I","imdb_id":"tt6979756","douban_score":7.7,"douban_votes":1025683,"genres":["动作","战争","奇幻"],"languages":["汉语普通话"],"release_date":"2023-07-20","year":2023,"regions":["中国大陆"],"updated_time":"2026-03-23T19:20:00+08:00"}' EX 21600
+SET movie:detail:90000004 '{"movie_id":90000004,"name":"壮志凌云2：独行侠","name_en":"Top Gun: Maverick","imdb_id":"tt1745960","douban_score":8.7,"douban_votes":653402,"genres":["动作","剧情"],"languages":["英语"],"release_date":"2022-05-27","year":2022,"regions":["美国"],"updated_time":"2026-03-23T19:20:00+08:00"}' EX 21600
+SET movie:detail:34841067 '{"movie_id":34841067,"name":"你好，李焕英","name_en":"Hi, Mom","imdb_id":"tt14188440","douban_score":7.7,"douban_votes":1456702,"genres":["剧情","喜剧","奇幻"],"languages":["汉语普通话"],"release_date":"2021-02-12","year":2021,"regions":["中国大陆"],"updated_time":"2026-03-23T19:20:00+08:00"}' EX 21600
+
+ZADD movie:hot:rank 98.8 35267208 97.6 36779979 97.2 90000001 96.7 90000002 95.8 25845392 95.0 90000003 94.4 30474725 93.8 34780991 93.2 90000004 92.6 34841067
+
+SET query:cache:movie:keyword:kehuan '{"keyword":"科幻","result_movie_ids":[35267208,90000002,90000003],"total":3,"query_time":"2026-03-23T19:21:00+08:00","source":"search_service"}' EX 1800
+SET query:cache:movie:keyword:sport '{"keyword":"运动","result_movie_ids":[36779979],"total":1,"query_time":"2026-03-23T19:21:00+08:00","source":"search_service"}' EX 1800
+SET query:cache:movie:keyword:oscars '{"keyword":"奥斯卡","result_movie_ids":[90000001],"total":1,"query_time":"2026-03-23T19:21:00+08:00","source":"search_service"}' EX 1800
+SET query:cache:movie:keyword:spring_festival '{"keyword":"春节档","result_movie_ids":[35267208,36779979,30474725,34841067],"total":4,"query_time":"2026-03-23T19:21:00+08:00","source":"search_service"}' EX 1800
+SET query:cache:movie:keyword:action '{"keyword":"动作","result_movie_ids":[90000002,90000003,90000004,34780991],"total":4,"query_time":"2026-03-23T19:21:00+08:00","source":"search_service"}' EX 1800
+
+HSET user:session:0ab7e3efacd56983f16503572d2b9915 user_md5 0ab7e3efacd56983f16503572d2b9915 user_nickname 恋丶你灬 city 北京 device iPhone13 app_version 8.9.2 last_access_time 2026-03-23T19:16:02+08:00 session_status ONLINE
+HSET user:session:5f4dcc3b5aa765d61d8327deb882cf99 user_md5 5f4dcc3b5aa765d61d8327deb882cf99 user_nickname 风继续吹 city 上海 device Android app_version 8.9.1 last_access_time 2026-03-23T19:08:55+08:00 session_status ONLINE
+HSET user:session:9e107d9d372bb6826bd81d3542a419d6 user_md5 9e107d9d372bb6826bd81d3542a419d6 user_nickname 月落乌啼 city 成都 device Web app_version web-2026.03 last_access_time 2026-03-23T18:58:14+08:00 session_status ONLINE
+HSET user:session:e10adc3949ba59abbe56e057f20f883e user_md5 e10adc3949ba59abbe56e057f20f883e user_nickname 银河补习班 city 广州 device Android app_version 8.9.2 last_access_time 2026-03-23T19:02:07+08:00 session_status ONLINE
+HSET user:session:25d55ad283aa400af464c76d713c07ad user_md5 25d55ad283aa400af464c76d713c07ad user_nickname 海边的曼彻斯特 city 杭州 device iPhone14 app_version 8.9.0 last_access_time 2026-03-23T18:49:31+08:00 session_status ONLINE
+HSET user:session:d8578edf8458ce06fbc5bb76a58c5ca4 user_md5 d8578edf8458ce06fbc5bb76a58c5ca4 user_nickname 花火 city 南京 device Web app_version web-2026.03 last_access_time 2026-03-23T18:41:22+08:00 session_status ONLINE
+HSET user:session:96e79218965eb72c92a549dd5a330112 user_md5 96e79218965eb72c92a549dd5a330112 user_nickname 逆光飞行 city 深圳 device Android app_version 8.9.2 last_access_time 2026-03-23T18:36:09+08:00 session_status ONLINE
+HSET user:session:6cb75f652a9b52798eb6cf2201057c73 user_md5 6cb75f652a9b52798eb6cf2201057c73 user_nickname 河畔青芒 city 西安 device iPhone12 app_version 8.9.1 last_access_time 2026-03-23T18:28:44+08:00 session_status ONLINE
+HSET user:session:c33367701511b4f6020ec61ded352059 user_md5 c33367701511b4f6020ec61ded352059 user_nickname 等风来 city 天津 device Android app_version 8.8.9 last_access_time 2026-03-23T18:22:17+08:00 session_status ONLINE
+HSET user:session:b59c67bf196a4758191e42f76670ceba user_md5 b59c67bf196a4758191e42f76670ceba user_nickname 南方有嘉木 city 重庆 device iPhone15 app_version 8.9.2 last_access_time 2026-03-23T18:15:53+08:00 session_status ONLINE
+EXPIRE user:session:0ab7e3efacd56983f16503572d2b9915 7200
+EXPIRE user:session:5f4dcc3b5aa765d61d8327deb882cf99 7200
+EXPIRE user:session:9e107d9d372bb6826bd81d3542a419d6 7200
+EXPIRE user:session:e10adc3949ba59abbe56e057f20f883e 7200
+EXPIRE user:session:25d55ad283aa400af464c76d713c07ad 7200
+EXPIRE user:session:d8578edf8458ce06fbc5bb76a58c5ca4 7200
+EXPIRE user:session:96e79218965eb72c92a549dd5a330112 7200
+EXPIRE user:session:6cb75f652a9b52798eb6cf2201057c73 7200
+EXPIRE user:session:c33367701511b4f6020ec61ded352059 7200
+EXPIRE user:session:b59c67bf196a4758191e42f76670ceba 7200
+
+RPUSH rec:user:0ab7e3efacd56983f16503572d2b9915 '{"movie_id":35267208,"recommend_score":0.973,"scene":"home_feed","rec_time":"2026-03-23T19:05:00+08:00"}' '{"movie_id":90000002,"recommend_score":0.946,"scene":"home_feed","rec_time":"2026-03-23T19:05:00+08:00"}' '{"movie_id":36779979,"recommend_score":0.901,"scene":"home_feed","rec_time":"2026-03-23T19:05:00+08:00"}'
+RPUSH rec:user:5f4dcc3b5aa765d61d8327deb882cf99 '{"movie_id":36779979,"recommend_score":0.932,"scene":"detail_page","rec_time":"2026-03-23T19:06:00+08:00"}' '{"movie_id":35267208,"recommend_score":0.882,"scene":"detail_page","rec_time":"2026-03-23T19:06:00+08:00"}' '{"movie_id":34841067,"recommend_score":0.851,"scene":"detail_page","rec_time":"2026-03-23T19:06:00+08:00"}'
+RPUSH rec:user:9e107d9d372bb6826bd81d3542a419d6 '{"movie_id":90000001,"recommend_score":0.915,"scene":"global_classic","rec_time":"2026-03-23T19:06:30+08:00"}' '{"movie_id":90000004,"recommend_score":0.876,"scene":"global_classic","rec_time":"2026-03-23T19:06:30+08:00"}' '{"movie_id":90000002,"recommend_score":0.842,"scene":"global_classic","rec_time":"2026-03-23T19:06:30+08:00"}'
+RPUSH rec:user:e10adc3949ba59abbe56e057f20f883e '{"movie_id":90000002,"recommend_score":0.901,"scene":"sci_fi_tab","rec_time":"2026-03-23T19:07:00+08:00"}' '{"movie_id":35267208,"recommend_score":0.864,"scene":"sci_fi_tab","rec_time":"2026-03-23T19:07:00+08:00"}' '{"movie_id":90000003,"recommend_score":0.831,"scene":"sci_fi_tab","rec_time":"2026-03-23T19:07:00+08:00"}'
+RPUSH rec:user:25d55ad283aa400af464c76d713c07ad '{"movie_id":25845392,"recommend_score":0.887,"scene":"war_topic","rec_time":"2026-03-23T19:07:30+08:00"}' '{"movie_id":34780991,"recommend_score":0.843,"scene":"war_topic","rec_time":"2026-03-23T19:07:30+08:00"}' '{"movie_id":30474725,"recommend_score":0.822,"scene":"war_topic","rec_time":"2026-03-23T19:07:30+08:00"}'
+EXPIRE rec:user:0ab7e3efacd56983f16503572d2b9915 3600
+EXPIRE rec:user:5f4dcc3b5aa765d61d8327deb882cf99 3600
+EXPIRE rec:user:9e107d9d372bb6826bd81d3542a419d6 3600
+EXPIRE rec:user:e10adc3949ba59abbe56e057f20f883e 3600
+EXPIRE rec:user:25d55ad283aa400af464c76d713c07ad 3600
+
+HSET movie:comment:summary:35267208 movie_id 35267208 comment_count 1 avg_rating 5.0 last_comment_time 2026-03-19T20:20:00+08:00 top_keywords 工业质感,数字生命,太空电梯 source mongodb.movie_reviews
+HSET movie:comment:summary:36779979 movie_id 36779979 comment_count 1 avg_rating 4.0 last_comment_time 2026-03-18T17:14:00+08:00 top_keywords 拳击,成长,春节档 source mongodb.movie_reviews
+HSET movie:comment:summary:90000001 movie_id 90000001 comment_count 1 avg_rating 5.0 last_comment_time 2026-03-17T22:05:00+08:00 top_keywords 历史,听证,传记 source mongodb.movie_reviews
+HSET movie:comment:summary:90000002 movie_id 90000002 comment_count 1 avg_rating 5.0 last_comment_time 2026-03-20T10:38:00+08:00 top_keywords 沙漠,史诗,音效 source mongodb.movie_reviews
+HSET movie:comment:summary:25845392 movie_id 25845392 comment_count 1 avg_rating 4.0 last_comment_time 2026-03-19T13:18:00+08:00 top_keywords 战争,历史,群像 source mongodb.movie_reviews
+HSET movie:comment:summary:90000003 movie_id 90000003 comment_count 1 avg_rating 5.0 last_comment_time 2026-03-20T14:30:00+08:00 top_keywords 漫威,多元宇宙,动作 source mongodb.movie_reviews
+HSET movie:comment:summary:30474725 movie_id 30474725 comment_count 1 avg_rating 3.0 last_comment_time 2026-03-20T16:12:00+08:00 top_keywords 悬疑,反转,古装 source mongodb.movie_reviews
+HSET movie:comment:summary:34780991 movie_id 34780991 comment_count 1 avg_rating 4.0 last_comment_time 2026-03-20T18:02:00+08:00 top_keywords 封神,史诗,世界观 source mongodb.movie_reviews
+HSET movie:comment:summary:90000004 movie_id 90000004 comment_count 1 avg_rating 4.0 last_comment_time 2026-03-20T19:55:00+08:00 top_keywords 飞行,战机,视听 source mongodb.movie_reviews
+HSET movie:comment:summary:34841067 movie_id 34841067 comment_count 1 avg_rating 4.0 last_comment_time 2026-03-20T21:11:00+08:00 top_keywords 亲情,穿越,春节档 source mongodb.movie_reviews
+EXPIRE movie:comment:summary:35267208 14400
+EXPIRE movie:comment:summary:36779979 14400
+EXPIRE movie:comment:summary:90000001 14400
+EXPIRE movie:comment:summary:90000002 14400
+EXPIRE movie:comment:summary:25845392 14400
+EXPIRE movie:comment:summary:90000003 14400
+EXPIRE movie:comment:summary:30474725 14400
+EXPIRE movie:comment:summary:34780991 14400
+EXPIRE movie:comment:summary:90000004 14400
+EXPIRE movie:comment:summary:34841067 14400

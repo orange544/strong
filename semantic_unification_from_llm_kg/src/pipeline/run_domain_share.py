@@ -32,6 +32,10 @@ from src.pipeline.orchestration_common import (
 from src.pipeline.orchestration_common import (
     safe_db_tag as _safe_db_tag,
 )
+from src.pipeline.unified_interface import (
+    extract_field_units_by_source,
+    field_units_to_sample_records,
+)
 from src.storage.ipfs_client import IPFSClient
 from src.storage.registry import append_run_record
 from src.utils.io import save_json
@@ -308,12 +312,16 @@ def run_domain_share(cfg: DomainShareConfig) -> dict[str, Any]:
     if not db_sources:
         raise RuntimeError("No database sources configured. Set DB_SOURCES_JSON or DB_PATHS.")
 
+    domain_field_units = extract_field_units_by_source(
+        db_sources,
+        max_fields_per_domain=cfg.max_fields_per_domain,
+    )
+
     if not cfg.skip_chain:
         _ensure_ipfs_chain_binary(cfg.ipfs_chain_bin, cfg.go_norn_root)
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     ipfs = _make_ipfs_client(cfg.ipfs_api)
-    registry = DatabasePluginRegistry()
     fd_agent = None
     if not cfg.mock_llm:
         fd_agent = FieldDescriptionAgent(
@@ -363,15 +371,7 @@ def run_domain_share(cfg: DomainShareConfig) -> dict[str, Any]:
 
         try:
             # 1) Sample by domain.
-            agent = _create_agent_for_source(registry, source)
-            try:
-                item["db_path"] = getattr(agent, "db_path", source.dsn)
-                samples = _sample_fields_for_domain(agent, cfg.max_fields_per_domain)
-            finally:
-                agent.close()
-
-            for s in samples:
-                s["db_name"] = domain_name
+            samples = field_units_to_sample_records(domain_field_units[domain_name])
 
             samples_file = Path(
                 save_json(samples, f"samples_{domain_slug}_{timestamp}.json")

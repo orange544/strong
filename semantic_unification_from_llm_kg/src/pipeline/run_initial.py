@@ -13,7 +13,6 @@ from src.configs.config import (
     LLM_UNIFY_CONFIG,
     PIPELINE_CONFIG,
 )
-from src.db.database_agent import generate_db_data, get_all_fields
 from src.db.plugin_registry import (
     DatabasePluginRegistry,
     DatabaseSource,
@@ -36,6 +35,11 @@ from src.pipeline.orchestration_common import (
 )
 from src.pipeline.orchestration_common import (
     wrap_single_table_fields_for_cross_domain as _wrap_single_table_fields_for_cross_domain,
+)
+from src.pipeline.unified_interface import (
+    build_db_data_from_field_units,
+    extract_field_units_by_source,
+    field_units_to_sample_records,
 )
 from src.storage.ipfs_client import IPFSClient
 from src.storage.registry import append_run_record
@@ -207,13 +211,16 @@ def run_all() -> None:
             f"or place SQLite files in '{db_folder}'."
         )
 
-    db_agents = _create_db_agents(db_sources, DatabasePluginRegistry())
-    ipfs = IPFSClient()
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-
     max_workers = PIPELINE_CONFIG["llm_desc_max_workers"]
     domain_timeout_sec = PIPELINE_CONFIG["llm_desc_domain_timeout_sec"]
     max_fields_per_domain = PIPELINE_CONFIG["run_max_fields_per_domain"]
+    domain_field_units = extract_field_units_by_source(
+        db_sources,
+        max_fields_per_domain=max_fields_per_domain,
+    )
+
+    ipfs = IPFSClient()
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
     run_record: dict[str, Any] = {
         "timestamp": timestamp,
@@ -229,16 +236,10 @@ def run_all() -> None:
 
     try:
         # ---------- Step 1: per-domain sampling + per-domain sample artifacts ----------
-        for db_name, agent in db_agents.items():
+        for db_name in db_sources:
             db_tag = _safe_db_tag(db_name)
             print(f"sampling database: {db_name}")
-            samples = get_all_fields(agent)
-
-            if max_fields_per_domain > 0:
-                samples = samples[:max_fields_per_domain]
-
-            for sample in samples:
-                sample["db_name"] = db_name
+            samples = field_units_to_sample_records(domain_field_units[db_name])
 
             sample_artifact = _build_sample_artifact(db_name, timestamp, samples)
             sample_filename = f"samples_{db_tag}_{timestamp}.json"
@@ -353,7 +354,7 @@ def run_all() -> None:
         run_record["unified_field_count"] = len(unified_fields)
 
         # ---------- Step 4: KG Cypher ----------
-        db_data = generate_db_data(db_agents)
+        db_data = build_db_data_from_field_units(domain_field_units)
         kg_agent = KnowledgeGraphAgent()
 
         domain_field_desc_map = {}
@@ -403,10 +404,6 @@ def run_all() -> None:
         except Exception as persist_exc:  # noqa: BLE001
             print(f"[warn] failed to persist failed run record: {persist_exc}")
         raise
-
-    finally:
-        for agent in db_agents.values():
-            agent.close()
 
 
 def run_pipeline() -> None:

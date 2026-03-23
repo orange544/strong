@@ -10,6 +10,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 import src.pipeline.run as pipeline_run
 from src.db.plugin_registry import DatabasePluginRegistry, DatabaseSource
+from src.db.unified.field_unit import FieldUnit
 
 
 def test_domain_share_optional_str_and_timeout_parsers(
@@ -143,22 +144,9 @@ def test_run_all_rejects_empty_sources(
         pipeline_run.run_all()
 
 
-def test_run_all_applies_max_fields_per_domain_cap_and_closes_agents(
+def test_run_all_applies_max_fields_per_domain_cap(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    class _FakeAgent:
-        def __init__(self) -> None:
-            self.closed = False
-
-        def close(self) -> None:
-            self.closed = True
-
-    fake_agent = _FakeAgent()
-
-    class _FakeRegistry:
-        def create_agent(self, _source: DatabaseSource) -> _FakeAgent:
-            return fake_agent
-
     class _FakeIPFS:
         pass
 
@@ -169,7 +157,6 @@ def test_run_all_applies_max_fields_per_domain_cap_and_closes_agents(
             "DB": DatabaseSource(name="DB", driver="sqlite", dsn="db.sqlite", options={}),
         },
     )
-    monkeypatch.setattr(pipeline_run, "_new_registry", lambda: cast(Any, _FakeRegistry()))
     monkeypatch.setattr(pipeline_run, "IPFSClient", _FakeIPFS)
     monkeypatch.setattr(
         pipeline_run,
@@ -193,13 +180,27 @@ def test_run_all_applies_max_fields_per_domain_cap_and_closes_agents(
         },
     )
     monkeypatch.setattr(pipeline_run, "_ensure_ipfs_chain_binary", lambda *_args, **_kwargs: None)
+    captured_max_fields: dict[str, int] = {}
     monkeypatch.setattr(
         pipeline_run,
-        "get_all_fields",
-        lambda _agent: [
-            {"table": "movie", "field": "id", "samples": [1]},
-            {"table": "movie", "field": "title", "samples": ["A"]},
-        ],
+        "extract_field_units_by_source",
+        lambda _sources, *, max_fields_per_domain=0: (
+            captured_max_fields.__setitem__("value", max_fields_per_domain),
+            {
+                "DB": [
+                    FieldUnit(
+                        source_name="DB",
+                        database_type="sqlite",
+                        container_name="movie",
+                        field_path="id",
+                        original_field="id",
+                        field_origin="column",
+                        logical_type="INTEGER",
+                        samples=("1",),
+                    )
+                ]
+            },
+        )[1],
     )
 
     def _stop_after_cap(db_name: str, timestamp: str, samples: list[dict[str, Any]]) -> dict[str, Any]:
@@ -213,7 +214,7 @@ def test_run_all_applies_max_fields_per_domain_cap_and_closes_agents(
     with pytest.raises(StopIteration, match="stop-after-cap"):
         pipeline_run.run_all()
 
-    assert fake_agent.closed is True
+    assert captured_max_fields["value"] == 1
 
 
 def test_run_pipeline_delegates_to_run_all(monkeypatch: pytest.MonkeyPatch) -> None:

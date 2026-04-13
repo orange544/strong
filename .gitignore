@@ -32,6 +32,23 @@ $RECYCLE.BIN/
 **/*.log
 **/outputs/
 !**/outputs/.gitkeep
+**/tmp/
+
+# Local datasets and large experiment payloads
+database/movie/datasets/
+database/movie/_downloads/
+database/nltk_data/
+database/tmp/
+database/gaoxiao_local_finaldb_*/
+database/valentine_experiments/data/
+database/valentine_experiments/results/
+database/valentine_experiments/external/
+semantic_unification_from_llm_kg/tmp/
+
+# Local database runtime files
+**/*.db
+**/*.db-shm
+**/*.db-wal
 
 # Local environment files
 **/.env

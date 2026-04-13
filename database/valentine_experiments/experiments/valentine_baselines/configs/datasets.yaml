@@ -1,0 +1,23 @@
+dataset_root: D:/Program Files/BISHE/program/database/valentine_experiments/data/valentine_datasets_official_zenodo_5084605/Valentine-datasets
+dataset_priority:
+  - Magellan
+  - OpenData
+  - ChEMBL
+  - TPC-DI
+  - Wikidata
+availability_snapshot:
+  Magellan:
+    status: ready
+    pair_count: 7
+  OpenData:
+    status: ready
+    pair_count: 180
+  ChEMBL:
+    status: ready
+    pair_count: 180
+  TPC-DI:
+    status: ready
+    pair_count: 180
+  Wikidata:
+    status: ready
+    pair_count: 4

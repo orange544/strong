@@ -35,7 +35,6 @@ ensureCollection("movie_tags", {
       genres: { bsonType: ["string", "array"] },
       tags: { bsonType: ["string", "array"] },
       year: { bsonType: ["int", "long", "string"] },
-      updated_time: { bsonType: ["date", "string"] }
     }
   }
 });

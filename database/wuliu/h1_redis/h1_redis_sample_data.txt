@@ -1,0 +1,708 @@
+DEL pending_sort_queue:{H0001} pending_sort_queue:{H0002} pending_sort_queue:{H0003} pending_sort_queue:{H0004} pending_sort_queue:{H0005} pending_sort_queue:{H0006} pending_sort_queue:{H0007} pending_sort_queue:{H0008} pending_sort_queue:{H0009} pending_sort_queue:{H0010} pending_sort_queue:{H0011} pending_sort_queue:{H0012} pending_sort_queue:{H0013} pending_sort_queue:{H0014} pending_sort_queue:{H0015} pending_sort_queue:{H0016} pending_sort_queue:{H0017} pending_sort_queue:{H0018} pending_sort_queue:{H0019} pending_sort_queue:{H0020} pending_sort_queue:{H0021} pending_sort_queue:{H0022} pending_sort_queue:{H0023} pending_sort_queue:{H0024} pending_sort_queue:{H0025} pending_sort_queue:{H0026} pending_sort_queue:{H0027} pending_sort_queue:{H0028} pending_sort_queue:{H0029} pending_sort_queue:{H0030} pending_sort_queue:{H0031} pending_sort_queue:{H0032} pending_sort_queue:{H0033} pending_sort_queue:{H0034} pending_sort_queue:{H0035} pending_sort_queue:{H0036} pending_sort_queue:{H0037} pending_sort_queue:{H0038} pending_sort_queue:{H0039} pending_sort_queue:{H0040} pending_sort_queue:{H0041} pending_sort_queue:{H0042} pending_sort_queue:{H0043} pending_sort_queue:{H0044} pending_sort_queue:{H0045} pending_sort_queue:{H0046} pending_sort_queue:{H0047} pending_sort_queue:{H0048} pending_sort_queue:{H0049} pending_sort_queue:{H0050} pending_sort_queue:{H0051} pending_sort_queue:{H0052} pending_sort_queue:{H0053} pending_sort_queue:{H0054} pending_sort_queue:{H0055} pending_sort_queue:{H0056} pending_sort_queue:{H0057} pending_sort_queue:{H0058} pending_sort_queue:{H0059} pending_sort_queue:{H0060} pending_sort_queue:{H0061} pending_sort_queue:{H0062} pending_sort_queue:{H0063} pending_sort_queue:{H0064} pending_sort_queue:{H0065} pending_sort_queue:{H0066} pending_sort_queue:{H0067} pending_sort_queue:{H0068} pending_sort_queue:{H0069} pending_sort_queue:{H0070} pending_sort_queue:{H0071} pending_sort_queue:{H0072} pending_sort_queue:{H0073} pending_sort_queue:{H0074} pending_sort_queue:{H0075} pending_sort_queue:{H0076} pending_sort_queue:{H0077} pending_sort_queue:{H0078} pending_sort_queue:{H0079} pending_sort_queue:{H0080} pending_sort_queue:{H0081} pending_sort_queue:{H0082} pending_sort_queue:{H0083} pending_sort_queue:{H0084} pending_sort_queue:{H0085} pending_sort_queue:{H0086} pending_sort_queue:{H0087} pending_sort_queue:{H0088}
+DEL node_throughput_state:{H0001} node_throughput_state:{H0002} node_throughput_state:{H0003} node_throughput_state:{H0004} node_throughput_state:{H0005} node_throughput_state:{H0006} node_throughput_state:{H0007} node_throughput_state:{H0008} node_throughput_state:{H0009} node_throughput_state:{H0010} node_throughput_state:{H0011} node_throughput_state:{H0012} node_throughput_state:{H0013} node_throughput_state:{H0014} node_throughput_state:{H0015} node_throughput_state:{H0016} node_throughput_state:{H0017} node_throughput_state:{H0018} node_throughput_state:{H0019} node_throughput_state:{H0020} node_throughput_state:{H0021} node_throughput_state:{H0022} node_throughput_state:{H0023} node_throughput_state:{H0024} node_throughput_state:{H0025} node_throughput_state:{H0026} node_throughput_state:{H0027} node_throughput_state:{H0028} node_throughput_state:{H0029} node_throughput_state:{H0030} node_throughput_state:{H0031} node_throughput_state:{H0032} node_throughput_state:{H0033} node_throughput_state:{H0034} node_throughput_state:{H0035} node_throughput_state:{H0036} node_throughput_state:{H0037} node_throughput_state:{H0038} node_throughput_state:{H0039} node_throughput_state:{H0040} node_throughput_state:{H0041} node_throughput_state:{H0042} node_throughput_state:{H0043} node_throughput_state:{H0044} node_throughput_state:{H0045} node_throughput_state:{H0046} node_throughput_state:{H0047} node_throughput_state:{H0048} node_throughput_state:{H0049} node_throughput_state:{H0050} node_throughput_state:{H0051} node_throughput_state:{H0052} node_throughput_state:{H0053} node_throughput_state:{H0054} node_throughput_state:{H0055} node_throughput_state:{H0056} node_throughput_state:{H0057} node_throughput_state:{H0058} node_throughput_state:{H0059} node_throughput_state:{H0060} node_throughput_state:{H0061} node_throughput_state:{H0062} node_throughput_state:{H0063} node_throughput_state:{H0064} node_throughput_state:{H0065} node_throughput_state:{H0066} node_throughput_state:{H0067} node_throughput_state:{H0068} node_throughput_state:{H0069} node_throughput_state:{H0070} node_throughput_state:{H0071} node_throughput_state:{H0072} node_throughput_state:{H0073} node_throughput_state:{H0074} node_throughput_state:{H0075} node_throughput_state:{H0076} node_throughput_state:{H0077} node_throughput_state:{H0078} node_throughput_state:{H0079} node_throughput_state:{H0080} node_throughput_state:{H0081} node_throughput_state:{H0082} node_throughput_state:{H0083} node_throughput_state:{H0084} node_throughput_state:{H0085} node_throughput_state:{H0086} node_throughput_state:{H0087} node_throughput_state:{H0088}
+DEL machine_status_cache:{DEV_SCAN_0001} machine_status_cache:{DEV_SCAN_0002} machine_status_cache:{DEV_SCAN_0003} machine_status_cache:{DEV_SCAN_0004} machine_status_cache:{DEV_SCAN_0005} machine_status_cache:{DEV_SCAN_0006} machine_status_cache:{DEV_SCAN_0007} machine_status_cache:{DEV_SCAN_0008} machine_status_cache:{DEV_SCAN_0009} machine_status_cache:{DEV_SCAN_0010} machine_status_cache:{DEV_SCAN_0011} machine_status_cache:{DEV_SCAN_0012} machine_status_cache:{DEV_SCAN_0013} machine_status_cache:{DEV_SCAN_0014} machine_status_cache:{DEV_SCAN_0015} machine_status_cache:{DEV_SCAN_0016} machine_status_cache:{DEV_SCAN_0017} machine_status_cache:{DEV_SCAN_0018} machine_status_cache:{DEV_SCAN_0019} machine_status_cache:{DEV_SCAN_0020} machine_status_cache:{DEV_SCAN_0021} machine_status_cache:{DEV_SCAN_0022} machine_status_cache:{DEV_SCAN_0023} machine_status_cache:{DEV_SCAN_0024} machine_status_cache:{DEV_SCAN_0025} machine_status_cache:{DEV_SCAN_0026} machine_status_cache:{DEV_SCAN_0027} machine_status_cache:{DEV_SCAN_0028} machine_status_cache:{DEV_SCAN_0029} machine_status_cache:{DEV_SCAN_0030} machine_status_cache:{DEV_SCAN_0031} machine_status_cache:{DEV_SCAN_0032} machine_status_cache:{DEV_SCAN_0033} machine_status_cache:{DEV_SCAN_0034} machine_status_cache:{DEV_SCAN_0035} machine_status_cache:{DEV_SCAN_0036} machine_status_cache:{DEV_SCAN_0037} machine_status_cache:{DEV_SCAN_0038} machine_status_cache:{DEV_SCAN_0039} machine_status_cache:{DEV_SCAN_0040} machine_status_cache:{DEV_SCAN_0041} machine_status_cache:{DEV_SCAN_0042} machine_status_cache:{DEV_SCAN_0043} machine_status_cache:{DEV_SCAN_0044} machine_status_cache:{DEV_SCAN_0045} machine_status_cache:{DEV_SCAN_0046} machine_status_cache:{DEV_SCAN_0047} machine_status_cache:{DEV_SCAN_0048} machine_status_cache:{DEV_SCAN_0049} machine_status_cache:{DEV_SCAN_0050} machine_status_cache:{DEV_SCAN_0051} machine_status_cache:{DEV_SCAN_0052} machine_status_cache:{DEV_SCAN_0053} machine_status_cache:{DEV_SCAN_0054} machine_status_cache:{DEV_SCAN_0055} machine_status_cache:{DEV_SCAN_0056} machine_status_cache:{DEV_SCAN_0057} machine_status_cache:{DEV_SCAN_0058} machine_status_cache:{DEV_SCAN_0059} machine_status_cache:{DEV_SCAN_0060} machine_status_cache:{DEV_SCAN_0061} machine_status_cache:{DEV_SCAN_0062} machine_status_cache:{DEV_SCAN_0063} machine_status_cache:{DEV_SCAN_0064} machine_status_cache:{DEV_SCAN_0065} machine_status_cache:{DEV_SCAN_0066} machine_status_cache:{DEV_SCAN_0067} machine_status_cache:{DEV_SCAN_0068} machine_status_cache:{DEV_SCAN_0069} machine_status_cache:{DEV_SCAN_0070} machine_status_cache:{DEV_SCAN_0071} machine_status_cache:{DEV_SCAN_0072} machine_status_cache:{DEV_SCAN_0073} machine_status_cache:{DEV_SCAN_0074} machine_status_cache:{DEV_SCAN_0075} machine_status_cache:{DEV_SCAN_0076} machine_status_cache:{DEV_SCAN_0077} machine_status_cache:{DEV_SCAN_0078} machine_status_cache:{DEV_SCAN_0079} machine_status_cache:{DEV_SCAN_0080} machine_status_cache:{DEV_SCAN_0081} machine_status_cache:{DEV_SCAN_0082} machine_status_cache:{DEV_SCAN_0083} machine_status_cache:{DEV_SCAN_0084} machine_status_cache:{DEV_SCAN_0085} machine_status_cache:{DEV_SCAN_0086} machine_status_cache:{DEV_SCAN_0087} machine_status_cache:{DEV_SCAN_0088}
+DEL alarm_state_cache:{ID_0001} alarm_state_cache:{ID_0002} alarm_state_cache:{ID_0003} alarm_state_cache:{ID_0004} alarm_state_cache:{ID_0005} alarm_state_cache:{ID_0006} alarm_state_cache:{ID_0007} alarm_state_cache:{ID_0008} alarm_state_cache:{ID_0009} alarm_state_cache:{ID_0010} alarm_state_cache:{ID_0011} alarm_state_cache:{ID_0012} alarm_state_cache:{ID_0013} alarm_state_cache:{ID_0014} alarm_state_cache:{ID_0015} alarm_state_cache:{ID_0016} alarm_state_cache:{ID_0017} alarm_state_cache:{ID_0018} alarm_state_cache:{ID_0019} alarm_state_cache:{ID_0020} alarm_state_cache:{ID_0021} alarm_state_cache:{ID_0022} alarm_state_cache:{ID_0023} alarm_state_cache:{ID_0024} alarm_state_cache:{ID_0025} alarm_state_cache:{ID_0026} alarm_state_cache:{ID_0027} alarm_state_cache:{ID_0028} alarm_state_cache:{ID_0029} alarm_state_cache:{ID_0030} alarm_state_cache:{ID_0031} alarm_state_cache:{ID_0032} alarm_state_cache:{ID_0033} alarm_state_cache:{ID_0034} alarm_state_cache:{ID_0035} alarm_state_cache:{ID_0036} alarm_state_cache:{ID_0037} alarm_state_cache:{ID_0038} alarm_state_cache:{ID_0039} alarm_state_cache:{ID_0040} alarm_state_cache:{ID_0041} alarm_state_cache:{ID_0042} alarm_state_cache:{ID_0043} alarm_state_cache:{ID_0044} alarm_state_cache:{ID_0045} alarm_state_cache:{ID_0046} alarm_state_cache:{ID_0047} alarm_state_cache:{ID_0048} alarm_state_cache:{ID_0049} alarm_state_cache:{ID_0050} alarm_state_cache:{ID_0051} alarm_state_cache:{ID_0052} alarm_state_cache:{ID_0053} alarm_state_cache:{ID_0054} alarm_state_cache:{ID_0055} alarm_state_cache:{ID_0056} alarm_state_cache:{ID_0057} alarm_state_cache:{ID_0058} alarm_state_cache:{ID_0059} alarm_state_cache:{ID_0060} alarm_state_cache:{ID_0061} alarm_state_cache:{ID_0062} alarm_state_cache:{ID_0063} alarm_state_cache:{ID_0064} alarm_state_cache:{ID_0065} alarm_state_cache:{ID_0066} alarm_state_cache:{ID_0067} alarm_state_cache:{ID_0068} alarm_state_cache:{ID_0069} alarm_state_cache:{ID_0070} alarm_state_cache:{ID_0071} alarm_state_cache:{ID_0072} alarm_state_cache:{ID_0073} alarm_state_cache:{ID_0074} alarm_state_cache:{ID_0075} alarm_state_cache:{ID_0076} alarm_state_cache:{ID_0077} alarm_state_cache:{ID_0078} alarm_state_cache:{ID_0079} alarm_state_cache:{ID_0080} alarm_state_cache:{ID_0081} alarm_state_cache:{ID_0082} alarm_state_cache:{ID_0083} alarm_state_cache:{ID_0084} alarm_state_cache:{ID_0085} alarm_state_cache:{ID_0086} alarm_state_cache:{ID_0087} alarm_state_cache:{ID_0088}
+RPUSH pending_sort_queue:{H0001} '{"package_no":"PKG0001","station_id":"H0001","priority_level":"L1","enqueue_time":"2025-01-01T08:05:10+08:00"}'
+RPUSH pending_sort_queue:{H0002} '{"package_no":"PKG0002","station_id":"H0002","priority_level":"L2","enqueue_time":"2025-02-04T10:12:21+08:00"}'
+RPUSH pending_sort_queue:{H0003} '{"package_no":"PKG0003","station_id":"H0003","priority_level":"L3","enqueue_time":"2025-03-07T12:19:32+08:00"}'
+RPUSH pending_sort_queue:{H0004} '{"package_no":"PKG0004","station_id":"H0004","priority_level":"高","enqueue_time":"2025-04-10T14:26:43+08:00"}'
+RPUSH pending_sort_queue:{H0005} '{"package_no":"PKG0005","station_id":"H0005","priority_level":"中","enqueue_time":"2025-05-13T16:33:54+08:00"}'
+RPUSH pending_sort_queue:{H0006} '{"package_no":"PKG0006","station_id":"H0006","priority_level":"低","enqueue_time":"2025-06-16T18:40:05+08:00"}'
+RPUSH pending_sort_queue:{H0007} '{"package_no":"PKG0007","station_id":"H0007","priority_level":"加急","enqueue_time":"2025-07-19T20:47:16+08:00"}'
+RPUSH pending_sort_queue:{H0008} '{"package_no":"PKG0008","station_id":"H0008","priority_level":"普通","enqueue_time":"2025-08-22T22:54:27+08:00"}'
+RPUSH pending_sort_queue:{H0009} '{"package_no":"PKG0009","station_id":"H0009","priority_level":"L1","enqueue_time":"2025-09-25T00:01:38+08:00"}'
+RPUSH pending_sort_queue:{H0010} '{"package_no":"PKG0010","station_id":"H0010","priority_level":"L2","enqueue_time":"2025-10-28T02:08:49+08:00"}'
+RPUSH pending_sort_queue:{H0011} '{"package_no":"PKG0011","station_id":"H0011","priority_level":"L3","enqueue_time":"2025-11-03T04:15:00+08:00"}'
+RPUSH pending_sort_queue:{H0012} '{"package_no":"PKG0012","station_id":"H0012","priority_level":"高","enqueue_time":"2025-12-06T06:22:11+08:00"}'
+RPUSH pending_sort_queue:{H0013} '{"package_no":"PKG0013","station_id":"H0013","priority_level":"中","enqueue_time":"2025-01-09T08:29:22+08:00"}'
+RPUSH pending_sort_queue:{H0014} '{"package_no":"PKG0014","station_id":"H0014","priority_level":"低","enqueue_time":"2025-02-12T10:36:33+08:00"}'
+RPUSH pending_sort_queue:{H0015} '{"package_no":"PKG0015","station_id":"H0015","priority_level":"加急","enqueue_time":"2025-03-15T12:43:44+08:00"}'
+RPUSH pending_sort_queue:{H0016} '{"package_no":"PKG0016","station_id":"H0016","priority_level":"普通","enqueue_time":"2025-04-18T14:50:55+08:00"}'
+RPUSH pending_sort_queue:{H0017} '{"package_no":"PKG0017","station_id":"H0017","priority_level":"L1","enqueue_time":"2025-05-21T16:57:06+08:00"}'
+RPUSH pending_sort_queue:{H0018} '{"package_no":"PKG0018","station_id":"H0018","priority_level":"L2","enqueue_time":"2025-06-24T18:04:17+08:00"}'
+RPUSH pending_sort_queue:{H0019} '{"package_no":"PKG0019","station_id":"H0019","priority_level":"L3","enqueue_time":"2025-07-27T20:11:28+08:00"}'
+RPUSH pending_sort_queue:{H0020} '{"package_no":"PKG0020","station_id":"H0020","priority_level":"高","enqueue_time":"2025-08-02T22:18:39+08:00"}'
+RPUSH pending_sort_queue:{H0021} '{"package_no":"PKG0021","station_id":"H0021","priority_level":"中","enqueue_time":"2025-09-05T00:25:50+08:00"}'
+RPUSH pending_sort_queue:{H0022} '{"package_no":"PKG0022","station_id":"H0022","priority_level":"低","enqueue_time":"2025-10-08T02:32:01+08:00"}'
+RPUSH pending_sort_queue:{H0023} '{"package_no":"PKG0023","station_id":"H0023","priority_level":"加急","enqueue_time":"2025-11-11T04:39:12+08:00"}'
+RPUSH pending_sort_queue:{H0024} '{"package_no":"PKG0024","station_id":"H0024","priority_level":"普通","enqueue_time":"2025-12-14T06:46:23+08:00"}'
+RPUSH pending_sort_queue:{H0025} '{"package_no":"PKG0025","station_id":"H0025","priority_level":"L1","enqueue_time":"2025-01-17T08:53:34+08:00"}'
+RPUSH pending_sort_queue:{H0026} '{"package_no":"PKG0026","station_id":"H0026","priority_level":"L2","enqueue_time":"2025-02-20T10:00:45+08:00"}'
+RPUSH pending_sort_queue:{H0027} '{"package_no":"PKG0027","station_id":"H0027","priority_level":"L3","enqueue_time":"2025-03-23T12:07:56+08:00"}'
+RPUSH pending_sort_queue:{H0028} '{"package_no":"PKG0028","station_id":"H0028","priority_level":"高","enqueue_time":"2025-04-26T14:14:07+08:00"}'
+RPUSH pending_sort_queue:{H0029} '{"package_no":"PKG0029","station_id":"H0029","priority_level":"中","enqueue_time":"2025-05-01T16:21:18+08:00"}'
+RPUSH pending_sort_queue:{H0030} '{"package_no":"PKG0030","station_id":"H0030","priority_level":"低","enqueue_time":"2025-06-04T18:28:29+08:00"}'
+RPUSH pending_sort_queue:{H0031} '{"package_no":"PKG0031","station_id":"H0031","priority_level":"加急","enqueue_time":"2025-07-07T20:35:40+08:00"}'
+RPUSH pending_sort_queue:{H0032} '{"package_no":"PKG0032","station_id":"H0032","priority_level":"普通","enqueue_time":"2025-08-10T22:42:51+08:00"}'
+RPUSH pending_sort_queue:{H0033} '{"package_no":"PKG0033","station_id":"H0033","priority_level":"L1","enqueue_time":"2025-09-13T00:49:02+08:00"}'
+RPUSH pending_sort_queue:{H0034} '{"package_no":"PKG0034","station_id":"H0034","priority_level":"L2","enqueue_time":"2025-10-16T02:56:13+08:00"}'
+RPUSH pending_sort_queue:{H0035} '{"package_no":"PKG0035","station_id":"H0035","priority_level":"L3","enqueue_time":"2025-11-19T04:03:24+08:00"}'
+RPUSH pending_sort_queue:{H0036} '{"package_no":"PKG0036","station_id":"H0036","priority_level":"高","enqueue_time":"2025-12-22T06:10:35+08:00"}'
+RPUSH pending_sort_queue:{H0037} '{"package_no":"PKG0037","station_id":"H0037","priority_level":"中","enqueue_time":"2025-01-25T08:17:46+08:00"}'
+RPUSH pending_sort_queue:{H0038} '{"package_no":"PKG0038","station_id":"H0038","priority_level":"低","enqueue_time":"2025-02-28T10:24:57+08:00"}'
+RPUSH pending_sort_queue:{H0039} '{"package_no":"PKG0039","station_id":"H0039","priority_level":"加急","enqueue_time":"2025-03-03T12:31:08+08:00"}'
+RPUSH pending_sort_queue:{H0040} '{"package_no":"PKG0040","station_id":"H0040","priority_level":"普通","enqueue_time":"2025-04-06T14:38:19+08:00"}'
+RPUSH pending_sort_queue:{H0041} '{"package_no":"PKG0041","station_id":"H0041","priority_level":"L1","enqueue_time":"2025-05-09T16:45:30+08:00"}'
+RPUSH pending_sort_queue:{H0042} '{"package_no":"PKG0042","station_id":"H0042","priority_level":"L2","enqueue_time":"2025-06-12T18:52:41+08:00"}'
+RPUSH pending_sort_queue:{H0043} '{"package_no":"PKG0043","station_id":"H0043","priority_level":"L3","enqueue_time":"2025-07-15T20:59:52+08:00"}'
+RPUSH pending_sort_queue:{H0044} '{"package_no":"PKG0044","station_id":"H0044","priority_level":"高","enqueue_time":"2025-08-18T22:06:03+08:00"}'
+RPUSH pending_sort_queue:{H0045} '{"package_no":"PKG0045","station_id":"H0045","priority_level":"中","enqueue_time":"2025-09-21T00:13:14+08:00"}'
+RPUSH pending_sort_queue:{H0046} '{"package_no":"PKG0046","station_id":"H0046","priority_level":"低","enqueue_time":"2025-10-24T02:20:25+08:00"}'
+RPUSH pending_sort_queue:{H0047} '{"package_no":"PKG0047","station_id":"H0047","priority_level":"加急","enqueue_time":"2025-11-27T04:27:36+08:00"}'
+RPUSH pending_sort_queue:{H0048} '{"package_no":"PKG0048","station_id":"H0048","priority_level":"普通","enqueue_time":"2025-12-02T06:34:47+08:00"}'
+RPUSH pending_sort_queue:{H0049} '{"package_no":"PKG0049","station_id":"H0049","priority_level":"L1","enqueue_time":"2025-01-05T08:41:58+08:00"}'
+RPUSH pending_sort_queue:{H0050} '{"package_no":"PKG0050","station_id":"H0050","priority_level":"L2","enqueue_time":"2025-02-08T10:48:09+08:00"}'
+RPUSH pending_sort_queue:{H0051} '{"package_no":"PKG0051","station_id":"H0051","priority_level":"L3","enqueue_time":"2025-03-11T12:55:20+08:00"}'
+RPUSH pending_sort_queue:{H0052} '{"package_no":"PKG0052","station_id":"H0052","priority_level":"高","enqueue_time":"2025-04-14T14:02:31+08:00"}'
+RPUSH pending_sort_queue:{H0053} '{"package_no":"PKG0053","station_id":"H0053","priority_level":"中","enqueue_time":"2025-05-17T16:09:42+08:00"}'
+RPUSH pending_sort_queue:{H0054} '{"package_no":"PKG0054","station_id":"H0054","priority_level":"低","enqueue_time":"2025-06-20T18:16:53+08:00"}'
+RPUSH pending_sort_queue:{H0055} '{"package_no":"PKG0055","station_id":"H0055","priority_level":"加急","enqueue_time":"2025-07-23T20:23:04+08:00"}'
+RPUSH pending_sort_queue:{H0056} '{"package_no":"PKG0056","station_id":"H0056","priority_level":"普通","enqueue_time":"2025-08-26T22:30:15+08:00"}'
+RPUSH pending_sort_queue:{H0057} '{"package_no":"PKG0057","station_id":"H0057","priority_level":"L1","enqueue_time":"2025-09-01T00:37:26+08:00"}'
+RPUSH pending_sort_queue:{H0058} '{"package_no":"PKG0058","station_id":"H0058","priority_level":"L2","enqueue_time":"2025-10-04T02:44:37+08:00"}'
+RPUSH pending_sort_queue:{H0059} '{"package_no":"PKG0059","station_id":"H0059","priority_level":"L3","enqueue_time":"2025-11-07T04:51:48+08:00"}'
+RPUSH pending_sort_queue:{H0060} '{"package_no":"PKG0060","station_id":"H0060","priority_level":"高","enqueue_time":"2025-12-10T06:58:59+08:00"}'
+RPUSH pending_sort_queue:{H0061} '{"package_no":"PKG0061","station_id":"H0061","priority_level":"中","enqueue_time":"2025-01-13T08:05:10+08:00"}'
+RPUSH pending_sort_queue:{H0062} '{"package_no":"PKG0062","station_id":"H0062","priority_level":"低","enqueue_time":"2025-02-16T10:12:21+08:00"}'
+RPUSH pending_sort_queue:{H0063} '{"package_no":"PKG0063","station_id":"H0063","priority_level":"加急","enqueue_time":"2025-03-19T12:19:32+08:00"}'
+RPUSH pending_sort_queue:{H0064} '{"package_no":"PKG0064","station_id":"H0064","priority_level":"普通","enqueue_time":"2025-04-22T14:26:43+08:00"}'
+RPUSH pending_sort_queue:{H0065} '{"package_no":"PKG0065","station_id":"H0065","priority_level":"L1","enqueue_time":"2025-05-25T16:33:54+08:00"}'
+RPUSH pending_sort_queue:{H0066} '{"package_no":"PKG0066","station_id":"H0066","priority_level":"L2","enqueue_time":"2025-06-28T18:40:05+08:00"}'
+RPUSH pending_sort_queue:{H0067} '{"package_no":"PKG0067","station_id":"H0067","priority_level":"L3","enqueue_time":"2025-07-03T20:47:16+08:00"}'
+RPUSH pending_sort_queue:{H0068} '{"package_no":"PKG0068","station_id":"H0068","priority_level":"高","enqueue_time":"2025-08-06T22:54:27+08:00"}'
+RPUSH pending_sort_queue:{H0069} '{"package_no":"PKG0069","station_id":"H0069","priority_level":"中","enqueue_time":"2025-09-09T00:01:38+08:00"}'
+RPUSH pending_sort_queue:{H0070} '{"package_no":"PKG0070","station_id":"H0070","priority_level":"低","enqueue_time":"2025-10-12T02:08:49+08:00"}'
+RPUSH pending_sort_queue:{H0071} '{"package_no":"PKG0071","station_id":"H0071","priority_level":"加急","enqueue_time":"2025-11-15T04:15:00+08:00"}'
+RPUSH pending_sort_queue:{H0072} '{"package_no":"PKG0072","station_id":"H0072","priority_level":"普通","enqueue_time":"2025-12-18T06:22:11+08:00"}'
+RPUSH pending_sort_queue:{H0073} '{"package_no":"PKG0073","station_id":"H0073","priority_level":"L1","enqueue_time":"2025-01-21T08:29:22+08:00"}'
+RPUSH pending_sort_queue:{H0074} '{"package_no":"PKG0074","station_id":"H0074","priority_level":"L2","enqueue_time":"2025-02-24T10:36:33+08:00"}'
+RPUSH pending_sort_queue:{H0075} '{"package_no":"PKG0075","station_id":"H0075","priority_level":"L3","enqueue_time":"2025-03-27T12:43:44+08:00"}'
+RPUSH pending_sort_queue:{H0076} '{"package_no":"PKG0076","station_id":"H0076","priority_level":"高","enqueue_time":"2025-04-02T14:50:55+08:00"}'
+RPUSH pending_sort_queue:{H0077} '{"package_no":"PKG0077","station_id":"H0077","priority_level":"中","enqueue_time":"2025-05-05T16:57:06+08:00"}'
+RPUSH pending_sort_queue:{H0078} '{"package_no":"PKG0078","station_id":"H0078","priority_level":"低","enqueue_time":"2025-06-08T18:04:17+08:00"}'
+RPUSH pending_sort_queue:{H0079} '{"package_no":"PKG0079","station_id":"H0079","priority_level":"加急","enqueue_time":"2025-07-11T20:11:28+08:00"}'
+RPUSH pending_sort_queue:{H0080} '{"package_no":"PKG0080","station_id":"H0080","priority_level":"普通","enqueue_time":"2025-08-14T22:18:39+08:00"}'
+RPUSH pending_sort_queue:{H0081} '{"package_no":"PKG0081","station_id":"H0081","priority_level":"L1","enqueue_time":"2025-09-17T00:25:50+08:00"}'
+RPUSH pending_sort_queue:{H0082} '{"package_no":"PKG0082","station_id":"H0082","priority_level":"L2","enqueue_time":"2025-10-20T02:32:01+08:00"}'
+RPUSH pending_sort_queue:{H0083} '{"package_no":"PKG0083","station_id":"H0083","priority_level":"L3","enqueue_time":"2025-11-23T04:39:12+08:00"}'
+RPUSH pending_sort_queue:{H0084} '{"package_no":"PKG0084","station_id":"H0084","priority_level":"高","enqueue_time":"2025-12-26T06:46:23+08:00"}'
+RPUSH pending_sort_queue:{H0085} '{"package_no":"PKG0085","station_id":"H0085","priority_level":"中","enqueue_time":"2025-01-01T08:53:34+08:00"}'
+RPUSH pending_sort_queue:{H0086} '{"package_no":"PKG0086","station_id":"H0086","priority_level":"低","enqueue_time":"2025-02-04T10:00:45+08:00"}'
+RPUSH pending_sort_queue:{H0087} '{"package_no":"PKG0087","station_id":"H0087","priority_level":"加急","enqueue_time":"2025-03-07T12:07:56+08:00"}'
+RPUSH pending_sort_queue:{H0088} '{"package_no":"PKG0088","station_id":"H0088","priority_level":"普通","enqueue_time":"2025-04-10T14:14:07+08:00"}'
+HSET node_throughput_state:{H0001} station_id H0001 current_throughput 860
+HSET node_throughput_state:{H0002} station_id H0002 current_throughput 861
+HSET node_throughput_state:{H0003} station_id H0003 current_throughput 862
+HSET node_throughput_state:{H0004} station_id H0004 current_throughput 863
+HSET node_throughput_state:{H0005} station_id H0005 current_throughput 865
+HSET node_throughput_state:{H0006} station_id H0006 current_throughput 866
+HSET node_throughput_state:{H0007} station_id H0007 current_throughput 867
+HSET node_throughput_state:{H0008} station_id H0008 current_throughput 868
+HSET node_throughput_state:{H0009} station_id H0009 current_throughput 869
+HSET node_throughput_state:{H0010} station_id H0010 current_throughput 870
+HSET node_throughput_state:{H0011} station_id H0011 current_throughput 871
+HSET node_throughput_state:{H0012} station_id H0012 current_throughput 872
+HSET node_throughput_state:{H0013} station_id H0013 current_throughput 874
+HSET node_throughput_state:{H0014} station_id H0014 current_throughput 875
+HSET node_throughput_state:{H0015} station_id H0015 current_throughput 876
+HSET node_throughput_state:{H0016} station_id H0016 current_throughput 877
+HSET node_throughput_state:{H0017} station_id H0017 current_throughput 878
+HSET node_throughput_state:{H0018} station_id H0018 current_throughput 879
+HSET node_throughput_state:{H0019} station_id H0019 current_throughput 880
+HSET node_throughput_state:{H0020} station_id H0020 current_throughput 881
+HSET node_throughput_state:{H0021} station_id H0021 current_throughput 883
+HSET node_throughput_state:{H0022} station_id H0022 current_throughput 884
+HSET node_throughput_state:{H0023} station_id H0023 current_throughput 885
+HSET node_throughput_state:{H0024} station_id H0024 current_throughput 886
+HSET node_throughput_state:{H0025} station_id H0025 current_throughput 887
+HSET node_throughput_state:{H0026} station_id H0026 current_throughput 888
+HSET node_throughput_state:{H0027} station_id H0027 current_throughput 889
+HSET node_throughput_state:{H0028} station_id H0028 current_throughput 891
+HSET node_throughput_state:{H0029} station_id H0029 current_throughput 892
+HSET node_throughput_state:{H0030} station_id H0030 current_throughput 893
+HSET node_throughput_state:{H0031} station_id H0031 current_throughput 894
+HSET node_throughput_state:{H0032} station_id H0032 current_throughput 895
+HSET node_throughput_state:{H0033} station_id H0033 current_throughput 896
+HSET node_throughput_state:{H0034} station_id H0034 current_throughput 897
+HSET node_throughput_state:{H0035} station_id H0035 current_throughput 898
+HSET node_throughput_state:{H0036} station_id H0036 current_throughput 900
+HSET node_throughput_state:{H0037} station_id H0037 current_throughput 901
+HSET node_throughput_state:{H0038} station_id H0038 current_throughput 902
+HSET node_throughput_state:{H0039} station_id H0039 current_throughput 903
+HSET node_throughput_state:{H0040} station_id H0040 current_throughput 904
+HSET node_throughput_state:{H0041} station_id H0041 current_throughput 905
+HSET node_throughput_state:{H0042} station_id H0042 current_throughput 906
+HSET node_throughput_state:{H0043} station_id H0043 current_throughput 907
+HSET node_throughput_state:{H0044} station_id H0044 current_throughput 909
+HSET node_throughput_state:{H0045} station_id H0045 current_throughput 910
+HSET node_throughput_state:{H0046} station_id H0046 current_throughput 911
+HSET node_throughput_state:{H0047} station_id H0047 current_throughput 912
+HSET node_throughput_state:{H0048} station_id H0048 current_throughput 913
+HSET node_throughput_state:{H0049} station_id H0049 current_throughput 914
+HSET node_throughput_state:{H0050} station_id H0050 current_throughput 915
+HSET node_throughput_state:{H0051} station_id H0051 current_throughput 916
+HSET node_throughput_state:{H0052} station_id H0052 current_throughput 918
+HSET node_throughput_state:{H0053} station_id H0053 current_throughput 919
+HSET node_throughput_state:{H0054} station_id H0054 current_throughput 920
+HSET node_throughput_state:{H0055} station_id H0055 current_throughput 921
+HSET node_throughput_state:{H0056} station_id H0056 current_throughput 922
+HSET node_throughput_state:{H0057} station_id H0057 current_throughput 923
+HSET node_throughput_state:{H0058} station_id H0058 current_throughput 924
+HSET node_throughput_state:{H0059} station_id H0059 current_throughput 926
+HSET node_throughput_state:{H0060} station_id H0060 current_throughput 927
+HSET node_throughput_state:{H0061} station_id H0061 current_throughput 928
+HSET node_throughput_state:{H0062} station_id H0062 current_throughput 929
+HSET node_throughput_state:{H0063} station_id H0063 current_throughput 930
+HSET node_throughput_state:{H0064} station_id H0064 current_throughput 931
+HSET node_throughput_state:{H0065} station_id H0065 current_throughput 932
+HSET node_throughput_state:{H0066} station_id H0066 current_throughput 933
+HSET node_throughput_state:{H0067} station_id H0067 current_throughput 935
+HSET node_throughput_state:{H0068} station_id H0068 current_throughput 936
+HSET node_throughput_state:{H0069} station_id H0069 current_throughput 937
+HSET node_throughput_state:{H0070} station_id H0070 current_throughput 938
+HSET node_throughput_state:{H0071} station_id H0071 current_throughput 939
+HSET node_throughput_state:{H0072} station_id H0072 current_throughput 940
+HSET node_throughput_state:{H0073} station_id H0073 current_throughput 941
+HSET node_throughput_state:{H0074} station_id H0074 current_throughput 942
+HSET node_throughput_state:{H0075} station_id H0075 current_throughput 944
+HSET node_throughput_state:{H0076} station_id H0076 current_throughput 945
+HSET node_throughput_state:{H0077} station_id H0077 current_throughput 946
+HSET node_throughput_state:{H0078} station_id H0078 current_throughput 947
+HSET node_throughput_state:{H0079} station_id H0079 current_throughput 948
+HSET node_throughput_state:{H0080} station_id H0080 current_throughput 949
+HSET node_throughput_state:{H0081} station_id H0081 current_throughput 950
+HSET node_throughput_state:{H0082} station_id H0082 current_throughput 952
+HSET node_throughput_state:{H0083} station_id H0083 current_throughput 953
+HSET node_throughput_state:{H0084} station_id H0084 current_throughput 954
+HSET node_throughput_state:{H0085} station_id H0085 current_throughput 955
+HSET node_throughput_state:{H0086} station_id H0086 current_throughput 956
+HSET node_throughput_state:{H0087} station_id H0087 current_throughput 957
+HSET node_throughput_state:{H0088} station_id H0088 current_throughput 958
+HSET machine_status_cache:{DEV_SCAN_0001} device_id DEV_SCAN_0001 station_id H0001 machine_status enabled alarm_flag N
+HSET machine_status_cache:{DEV_SCAN_0002} device_id DEV_SCAN_0002 station_id H0002 machine_status disabled alarm_flag Y
+HSET machine_status_cache:{DEV_SCAN_0003} device_id DEV_SCAN_0003 station_id H0003 machine_status ACTIVE alarm_flag Y
+HSET machine_status_cache:{DEV_SCAN_0004} device_id DEV_SCAN_0004 station_id H0004 machine_status INACTIVE alarm_flag N
+HSET machine_status_cache:{DEV_SCAN_0005} device_id DEV_SCAN_0005 station_id H0005 machine_status confirmed alarm_flag Y
+HSET machine_status_cache:{DEV_SCAN_0006} device_id DEV_SCAN_0006 station_id H0006 machine_status pending alarm_flag Y
+HSET machine_status_cache:{DEV_SCAN_0007} device_id DEV_SCAN_0007 station_id H0007 machine_status processing alarm_flag N
+HSET machine_status_cache:{DEV_SCAN_0008} device_id DEV_SCAN_0008 station_id H0008 machine_status synced alarm_flag Y
+HSET machine_status_cache:{DEV_SCAN_0009} device_id DEV_SCAN_0009 station_id H0009 machine_status finished alarm_flag Y
+HSET machine_status_cache:{DEV_SCAN_0010} device_id DEV_SCAN_0010 station_id H0010 machine_status closed alarm_flag N
+HSET machine_status_cache:{DEV_SCAN_0011} device_id DEV_SCAN_0011 station_id H0011 machine_status open alarm_flag Y
+HSET machine_status_cache:{DEV_SCAN_0012} device_id DEV_SCAN_0012 station_id H0012 machine_status archived alarm_flag Y
+HSET machine_status_cache:{DEV_SCAN_0013} device_id DEV_SCAN_0013 station_id H0013 machine_status frozen alarm_flag N
+HSET machine_status_cache:{DEV_SCAN_0014} device_id DEV_SCAN_0014 station_id H0014 machine_status draft alarm_flag Y
+HSET machine_status_cache:{DEV_SCAN_0015} device_id DEV_SCAN_0015 station_id H0015 machine_status valid alarm_flag Y
+HSET machine_status_cache:{DEV_SCAN_0016} device_id DEV_SCAN_0016 station_id H0016 machine_status invalid alarm_flag N
+HSET machine_status_cache:{DEV_SCAN_0017} device_id DEV_SCAN_0017 station_id H0017 machine_status enabled alarm_flag Y
+HSET machine_status_cache:{DEV_SCAN_0018} device_id DEV_SCAN_0018 station_id H0018 machine_status disabled alarm_flag Y
+HSET machine_status_cache:{DEV_SCAN_0019} device_id DEV_SCAN_0019 station_id H0019 machine_status ACTIVE alarm_flag N
+HSET machine_status_cache:{DEV_SCAN_0020} device_id DEV_SCAN_0020 station_id H0020 machine_status INACTIVE alarm_flag Y
+HSET machine_status_cache:{DEV_SCAN_0021} device_id DEV_SCAN_0021 station_id H0021 machine_status confirmed alarm_flag Y
+HSET machine_status_cache:{DEV_SCAN_0022} device_id DEV_SCAN_0022 station_id H0022 machine_status pending alarm_flag N
+HSET machine_status_cache:{DEV_SCAN_0023} device_id DEV_SCAN_0023 station_id H0023 machine_status processing alarm_flag Y
+HSET machine_status_cache:{DEV_SCAN_0024} device_id DEV_SCAN_0024 station_id H0024 machine_status synced alarm_flag Y
+HSET machine_status_cache:{DEV_SCAN_0025} device_id DEV_SCAN_0025 station_id H0025 machine_status finished alarm_flag N
+HSET machine_status_cache:{DEV_SCAN_0026} device_id DEV_SCAN_0026 station_id H0026 machine_status closed alarm_flag Y
+HSET machine_status_cache:{DEV_SCAN_0027} device_id DEV_SCAN_0027 station_id H0027 machine_status open alarm_flag Y
+HSET machine_status_cache:{DEV_SCAN_0028} device_id DEV_SCAN_0028 station_id H0028 machine_status archived alarm_flag N
+HSET machine_status_cache:{DEV_SCAN_0029} device_id DEV_SCAN_0029 station_id H0029 machine_status frozen alarm_flag Y
+HSET machine_status_cache:{DEV_SCAN_0030} device_id DEV_SCAN_0030 station_id H0030 machine_status draft alarm_flag Y
+HSET machine_status_cache:{DEV_SCAN_0031} device_id DEV_SCAN_0031 station_id H0031 machine_status valid alarm_flag N
+HSET machine_status_cache:{DEV_SCAN_0032} device_id DEV_SCAN_0032 station_id H0032 machine_status invalid alarm_flag Y
+HSET machine_status_cache:{DEV_SCAN_0033} device_id DEV_SCAN_0033 station_id H0033 machine_status enabled alarm_flag Y
+HSET machine_status_cache:{DEV_SCAN_0034} device_id DEV_SCAN_0034 station_id H0034 machine_status disabled alarm_flag N
+HSET machine_status_cache:{DEV_SCAN_0035} device_id DEV_SCAN_0035 station_id H0035 machine_status ACTIVE alarm_flag Y
+HSET machine_status_cache:{DEV_SCAN_0036} device_id DEV_SCAN_0036 station_id H0036 machine_status INACTIVE alarm_flag Y
+HSET machine_status_cache:{DEV_SCAN_0037} device_id DEV_SCAN_0037 station_id H0037 machine_status confirmed alarm_flag N
+HSET machine_status_cache:{DEV_SCAN_0038} device_id DEV_SCAN_0038 station_id H0038 machine_status pending alarm_flag Y
+HSET machine_status_cache:{DEV_SCAN_0039} device_id DEV_SCAN_0039 station_id H0039 machine_status processing alarm_flag Y
+HSET machine_status_cache:{DEV_SCAN_0040} device_id DEV_SCAN_0040 station_id H0040 machine_status synced alarm_flag N
+HSET machine_status_cache:{DEV_SCAN_0041} device_id DEV_SCAN_0041 station_id H0041 machine_status finished alarm_flag Y
+HSET machine_status_cache:{DEV_SCAN_0042} device_id DEV_SCAN_0042 station_id H0042 machine_status closed alarm_flag Y
+HSET machine_status_cache:{DEV_SCAN_0043} device_id DEV_SCAN_0043 station_id H0043 machine_status open alarm_flag N
+HSET machine_status_cache:{DEV_SCAN_0044} device_id DEV_SCAN_0044 station_id H0044 machine_status archived alarm_flag Y
+HSET machine_status_cache:{DEV_SCAN_0045} device_id DEV_SCAN_0045 station_id H0045 machine_status frozen alarm_flag Y
+HSET machine_status_cache:{DEV_SCAN_0046} device_id DEV_SCAN_0046 station_id H0046 machine_status draft alarm_flag N
+HSET machine_status_cache:{DEV_SCAN_0047} device_id DEV_SCAN_0047 station_id H0047 machine_status valid alarm_flag Y
+HSET machine_status_cache:{DEV_SCAN_0048} device_id DEV_SCAN_0048 station_id H0048 machine_status invalid alarm_flag Y
+HSET machine_status_cache:{DEV_SCAN_0049} device_id DEV_SCAN_0049 station_id H0049 machine_status enabled alarm_flag N
+HSET machine_status_cache:{DEV_SCAN_0050} device_id DEV_SCAN_0050 station_id H0050 machine_status disabled alarm_flag Y
+HSET machine_status_cache:{DEV_SCAN_0051} device_id DEV_SCAN_0051 station_id H0051 machine_status ACTIVE alarm_flag Y
+HSET machine_status_cache:{DEV_SCAN_0052} device_id DEV_SCAN_0052 station_id H0052 machine_status INACTIVE alarm_flag N
+HSET machine_status_cache:{DEV_SCAN_0053} device_id DEV_SCAN_0053 station_id H0053 machine_status confirmed alarm_flag Y
+HSET machine_status_cache:{DEV_SCAN_0054} device_id DEV_SCAN_0054 station_id H0054 machine_status pending alarm_flag Y
+HSET machine_status_cache:{DEV_SCAN_0055} device_id DEV_SCAN_0055 station_id H0055 machine_status processing alarm_flag N
+HSET machine_status_cache:{DEV_SCAN_0056} device_id DEV_SCAN_0056 station_id H0056 machine_status synced alarm_flag Y
+HSET machine_status_cache:{DEV_SCAN_0057} device_id DEV_SCAN_0057 station_id H0057 machine_status finished alarm_flag Y
+HSET machine_status_cache:{DEV_SCAN_0058} device_id DEV_SCAN_0058 station_id H0058 machine_status closed alarm_flag N
+HSET machine_status_cache:{DEV_SCAN_0059} device_id DEV_SCAN_0059 station_id H0059 machine_status open alarm_flag Y
+HSET machine_status_cache:{DEV_SCAN_0060} device_id DEV_SCAN_0060 station_id H0060 machine_status archived alarm_flag Y
+HSET machine_status_cache:{DEV_SCAN_0061} device_id DEV_SCAN_0061 station_id H0061 machine_status frozen alarm_flag N
+HSET machine_status_cache:{DEV_SCAN_0062} device_id DEV_SCAN_0062 station_id H0062 machine_status draft alarm_flag Y
+HSET machine_status_cache:{DEV_SCAN_0063} device_id DEV_SCAN_0063 station_id H0063 machine_status valid alarm_flag Y
+HSET machine_status_cache:{DEV_SCAN_0064} device_id DEV_SCAN_0064 station_id H0064 machine_status invalid alarm_flag N
+HSET machine_status_cache:{DEV_SCAN_0065} device_id DEV_SCAN_0065 station_id H0065 machine_status enabled alarm_flag Y
+HSET machine_status_cache:{DEV_SCAN_0066} device_id DEV_SCAN_0066 station_id H0066 machine_status disabled alarm_flag Y
+HSET machine_status_cache:{DEV_SCAN_0067} device_id DEV_SCAN_0067 station_id H0067 machine_status ACTIVE alarm_flag N
+HSET machine_status_cache:{DEV_SCAN_0068} device_id DEV_SCAN_0068 station_id H0068 machine_status INACTIVE alarm_flag Y
+HSET machine_status_cache:{DEV_SCAN_0069} device_id DEV_SCAN_0069 station_id H0069 machine_status confirmed alarm_flag Y
+HSET machine_status_cache:{DEV_SCAN_0070} device_id DEV_SCAN_0070 station_id H0070 machine_status pending alarm_flag N
+HSET machine_status_cache:{DEV_SCAN_0071} device_id DEV_SCAN_0071 station_id H0071 machine_status processing alarm_flag Y
+HSET machine_status_cache:{DEV_SCAN_0072} device_id DEV_SCAN_0072 station_id H0072 machine_status synced alarm_flag Y
+HSET machine_status_cache:{DEV_SCAN_0073} device_id DEV_SCAN_0073 station_id H0073 machine_status finished alarm_flag N
+HSET machine_status_cache:{DEV_SCAN_0074} device_id DEV_SCAN_0074 station_id H0074 machine_status closed alarm_flag Y
+HSET machine_status_cache:{DEV_SCAN_0075} device_id DEV_SCAN_0075 station_id H0075 machine_status open alarm_flag Y
+HSET machine_status_cache:{DEV_SCAN_0076} device_id DEV_SCAN_0076 station_id H0076 machine_status archived alarm_flag N
+HSET machine_status_cache:{DEV_SCAN_0077} device_id DEV_SCAN_0077 station_id H0077 machine_status frozen alarm_flag Y
+HSET machine_status_cache:{DEV_SCAN_0078} device_id DEV_SCAN_0078 station_id H0078 machine_status draft alarm_flag Y
+HSET machine_status_cache:{DEV_SCAN_0079} device_id DEV_SCAN_0079 station_id H0079 machine_status valid alarm_flag N
+HSET machine_status_cache:{DEV_SCAN_0080} device_id DEV_SCAN_0080 station_id H0080 machine_status invalid alarm_flag Y
+HSET machine_status_cache:{DEV_SCAN_0081} device_id DEV_SCAN_0081 station_id H0081 machine_status enabled alarm_flag Y
+HSET machine_status_cache:{DEV_SCAN_0082} device_id DEV_SCAN_0082 station_id H0082 machine_status disabled alarm_flag N
+HSET machine_status_cache:{DEV_SCAN_0083} device_id DEV_SCAN_0083 station_id H0083 machine_status ACTIVE alarm_flag Y
+HSET machine_status_cache:{DEV_SCAN_0084} device_id DEV_SCAN_0084 station_id H0084 machine_status INACTIVE alarm_flag Y
+HSET machine_status_cache:{DEV_SCAN_0085} device_id DEV_SCAN_0085 station_id H0085 machine_status confirmed alarm_flag N
+HSET machine_status_cache:{DEV_SCAN_0086} device_id DEV_SCAN_0086 station_id H0086 machine_status pending alarm_flag Y
+HSET machine_status_cache:{DEV_SCAN_0087} device_id DEV_SCAN_0087 station_id H0087 machine_status processing alarm_flag Y
+HSET machine_status_cache:{DEV_SCAN_0088} device_id DEV_SCAN_0088 station_id H0088 machine_status synced alarm_flag N
+HSET alarm_state_cache:{ID_0001} alarm_id ID_0001 station_id H0001 alarm_type 标准 alarm_status process_status trigger_time 2025-01-01T08:05:10+08:00 recover_time 2025-01-01T08:05:10+08:00
+HSET alarm_state_cache:{ID_0002} alarm_id ID_0002 station_id H0002 alarm_type 加急 alarm_status process_status trigger_time 2025-02-04T10:12:21+08:00 recover_time 2025-02-04T10:12:21+08:00
+HSET alarm_state_cache:{ID_0003} alarm_id ID_0003 station_id H0003 alarm_type 冷链 alarm_status process_status trigger_time 2025-03-07T12:19:32+08:00 recover_time 2025-03-07T12:19:32+08:00
+HSET alarm_state_cache:{ID_0004} alarm_id ID_0004 station_id H0004 alarm_type 电商 alarm_status process_status trigger_time 2025-04-10T14:26:43+08:00 recover_time 2025-04-10T14:26:43+08:00
+HSET alarm_state_cache:{ID_0005} alarm_id ID_0005 station_id H0005 alarm_type 医药 alarm_status process_status trigger_time 2025-05-13T16:33:54+08:00 recover_time 2025-05-13T16:33:54+08:00
+HSET alarm_state_cache:{ID_0006} alarm_id ID_0006 station_id H0006 alarm_type 工业品 alarm_status process_status trigger_time 2025-06-16T18:40:05+08:00 recover_time 2025-06-16T18:40:05+08:00
+HSET alarm_state_cache:{ID_0007} alarm_id ID_0007 station_id H0007 alarm_type 零担 alarm_status process_status trigger_time 2025-07-19T20:47:16+08:00 recover_time 2025-07-19T20:47:16+08:00
+HSET alarm_state_cache:{ID_0008} alarm_id ID_0008 station_id H0008 alarm_type 整车 alarm_status process_status trigger_time 2025-08-22T22:54:27+08:00 recover_time 2025-08-22T22:54:27+08:00
+HSET alarm_state_cache:{ID_0009} alarm_id ID_0009 station_id H0009 alarm_type 标准 alarm_status process_status trigger_time 2025-09-25T00:01:38+08:00 recover_time 2025-09-25T00:01:38+08:00
+HSET alarm_state_cache:{ID_0010} alarm_id ID_0010 station_id H0010 alarm_type 加急 alarm_status process_status trigger_time 2025-10-28T02:08:49+08:00 recover_time 2025-10-28T02:08:49+08:00
+HSET alarm_state_cache:{ID_0011} alarm_id ID_0011 station_id H0011 alarm_type 冷链 alarm_status process_status trigger_time 2025-11-03T04:15:00+08:00 recover_time 2025-11-03T04:15:00+08:00
+HSET alarm_state_cache:{ID_0012} alarm_id ID_0012 station_id H0012 alarm_type 电商 alarm_status process_status trigger_time 2025-12-06T06:22:11+08:00 recover_time 2025-12-06T06:22:11+08:00
+HSET alarm_state_cache:{ID_0013} alarm_id ID_0013 station_id H0013 alarm_type 医药 alarm_status process_status trigger_time 2025-01-09T08:29:22+08:00 recover_time 2025-01-09T08:29:22+08:00
+HSET alarm_state_cache:{ID_0014} alarm_id ID_0014 station_id H0014 alarm_type 工业品 alarm_status process_status trigger_time 2025-02-12T10:36:33+08:00 recover_time 2025-02-12T10:36:33+08:00
+HSET alarm_state_cache:{ID_0015} alarm_id ID_0015 station_id H0015 alarm_type 零担 alarm_status process_status trigger_time 2025-03-15T12:43:44+08:00 recover_time 2025-03-15T12:43:44+08:00
+HSET alarm_state_cache:{ID_0016} alarm_id ID_0016 station_id H0016 alarm_type 整车 alarm_status process_status trigger_time 2025-04-18T14:50:55+08:00 recover_time 2025-04-18T14:50:55+08:00
+HSET alarm_state_cache:{ID_0017} alarm_id ID_0017 station_id H0017 alarm_type 标准 alarm_status process_status trigger_time 2025-05-21T16:57:06+08:00 recover_time 2025-05-21T16:57:06+08:00
+HSET alarm_state_cache:{ID_0018} alarm_id ID_0018 station_id H0018 alarm_type 加急 alarm_status process_status trigger_time 2025-06-24T18:04:17+08:00 recover_time 2025-06-24T18:04:17+08:00
+HSET alarm_state_cache:{ID_0019} alarm_id ID_0019 station_id H0019 alarm_type 冷链 alarm_status process_status trigger_time 2025-07-27T20:11:28+08:00 recover_time 2025-07-27T20:11:28+08:00
+HSET alarm_state_cache:{ID_0020} alarm_id ID_0020 station_id H0020 alarm_type 电商 alarm_status process_status trigger_time 2025-08-02T22:18:39+08:00 recover_time 2025-08-02T22:18:39+08:00
+HSET alarm_state_cache:{ID_0021} alarm_id ID_0021 station_id H0021 alarm_type 医药 alarm_status process_status trigger_time 2025-09-05T00:25:50+08:00 recover_time 2025-09-05T00:25:50+08:00
+HSET alarm_state_cache:{ID_0022} alarm_id ID_0022 station_id H0022 alarm_type 工业品 alarm_status process_status trigger_time 2025-10-08T02:32:01+08:00 recover_time 2025-10-08T02:32:01+08:00
+HSET alarm_state_cache:{ID_0023} alarm_id ID_0023 station_id H0023 alarm_type 零担 alarm_status process_status trigger_time 2025-11-11T04:39:12+08:00 recover_time 2025-11-11T04:39:12+08:00
+HSET alarm_state_cache:{ID_0024} alarm_id ID_0024 station_id H0024 alarm_type 整车 alarm_status process_status trigger_time 2025-12-14T06:46:23+08:00 recover_time 2025-12-14T06:46:23+08:00
+HSET alarm_state_cache:{ID_0025} alarm_id ID_0025 station_id H0025 alarm_type 标准 alarm_status process_status trigger_time 2025-01-17T08:53:34+08:00 recover_time 2025-01-17T08:53:34+08:00
+HSET alarm_state_cache:{ID_0026} alarm_id ID_0026 station_id H0026 alarm_type 加急 alarm_status process_status trigger_time 2025-02-20T10:00:45+08:00 recover_time 2025-02-20T10:00:45+08:00
+HSET alarm_state_cache:{ID_0027} alarm_id ID_0027 station_id H0027 alarm_type 冷链 alarm_status process_status trigger_time 2025-03-23T12:07:56+08:00 recover_time 2025-03-23T12:07:56+08:00
+HSET alarm_state_cache:{ID_0028} alarm_id ID_0028 station_id H0028 alarm_type 电商 alarm_status process_status trigger_time 2025-04-26T14:14:07+08:00 recover_time 2025-04-26T14:14:07+08:00
+HSET alarm_state_cache:{ID_0029} alarm_id ID_0029 station_id H0029 alarm_type 医药 alarm_status process_status trigger_time 2025-05-01T16:21:18+08:00 recover_time 2025-05-01T16:21:18+08:00
+HSET alarm_state_cache:{ID_0030} alarm_id ID_0030 station_id H0030 alarm_type 工业品 alarm_status process_status trigger_time 2025-06-04T18:28:29+08:00 recover_time 2025-06-04T18:28:29+08:00
+HSET alarm_state_cache:{ID_0031} alarm_id ID_0031 station_id H0031 alarm_type 零担 alarm_status process_status trigger_time 2025-07-07T20:35:40+08:00 recover_time 2025-07-07T20:35:40+08:00
+HSET alarm_state_cache:{ID_0032} alarm_id ID_0032 station_id H0032 alarm_type 整车 alarm_status process_status trigger_time 2025-08-10T22:42:51+08:00 recover_time 2025-08-10T22:42:51+08:00
+HSET alarm_state_cache:{ID_0033} alarm_id ID_0033 station_id H0033 alarm_type 标准 alarm_status process_status trigger_time 2025-09-13T00:49:02+08:00 recover_time 2025-09-13T00:49:02+08:00
+HSET alarm_state_cache:{ID_0034} alarm_id ID_0034 station_id H0034 alarm_type 加急 alarm_status process_status trigger_time 2025-10-16T02:56:13+08:00 recover_time 2025-10-16T02:56:13+08:00
+HSET alarm_state_cache:{ID_0035} alarm_id ID_0035 station_id H0035 alarm_type 冷链 alarm_status process_status trigger_time 2025-11-19T04:03:24+08:00 recover_time 2025-11-19T04:03:24+08:00
+HSET alarm_state_cache:{ID_0036} alarm_id ID_0036 station_id H0036 alarm_type 电商 alarm_status process_status trigger_time 2025-12-22T06:10:35+08:00 recover_time 2025-12-22T06:10:35+08:00
+HSET alarm_state_cache:{ID_0037} alarm_id ID_0037 station_id H0037 alarm_type 医药 alarm_status process_status trigger_time 2025-01-25T08:17:46+08:00 recover_time 2025-01-25T08:17:46+08:00
+HSET alarm_state_cache:{ID_0038} alarm_id ID_0038 station_id H0038 alarm_type 工业品 alarm_status process_status trigger_time 2025-02-28T10:24:57+08:00 recover_time 2025-02-28T10:24:57+08:00
+HSET alarm_state_cache:{ID_0039} alarm_id ID_0039 station_id H0039 alarm_type 零担 alarm_status process_status trigger_time 2025-03-03T12:31:08+08:00 recover_time 2025-03-03T12:31:08+08:00
+HSET alarm_state_cache:{ID_0040} alarm_id ID_0040 station_id H0040 alarm_type 整车 alarm_status process_status trigger_time 2025-04-06T14:38:19+08:00 recover_time 2025-04-06T14:38:19+08:00
+HSET alarm_state_cache:{ID_0041} alarm_id ID_0041 station_id H0041 alarm_type 标准 alarm_status process_status trigger_time 2025-05-09T16:45:30+08:00 recover_time 2025-05-09T16:45:30+08:00
+HSET alarm_state_cache:{ID_0042} alarm_id ID_0042 station_id H0042 alarm_type 加急 alarm_status process_status trigger_time 2025-06-12T18:52:41+08:00 recover_time 2025-06-12T18:52:41+08:00
+HSET alarm_state_cache:{ID_0043} alarm_id ID_0043 station_id H0043 alarm_type 冷链 alarm_status process_status trigger_time 2025-07-15T20:59:52+08:00 recover_time 2025-07-15T20:59:52+08:00
+HSET alarm_state_cache:{ID_0044} alarm_id ID_0044 station_id H0044 alarm_type 电商 alarm_status process_status trigger_time 2025-08-18T22:06:03+08:00 recover_time 2025-08-18T22:06:03+08:00
+HSET alarm_state_cache:{ID_0045} alarm_id ID_0045 station_id H0045 alarm_type 医药 alarm_status process_status trigger_time 2025-09-21T00:13:14+08:00 recover_time 2025-09-21T00:13:14+08:00
+HSET alarm_state_cache:{ID_0046} alarm_id ID_0046 station_id H0046 alarm_type 工业品 alarm_status process_status trigger_time 2025-10-24T02:20:25+08:00 recover_time 2025-10-24T02:20:25+08:00
+HSET alarm_state_cache:{ID_0047} alarm_id ID_0047 station_id H0047 alarm_type 零担 alarm_status process_status trigger_time 2025-11-27T04:27:36+08:00 recover_time 2025-11-27T04:27:36+08:00
+HSET alarm_state_cache:{ID_0048} alarm_id ID_0048 station_id H0048 alarm_type 整车 alarm_status process_status trigger_time 2025-12-02T06:34:47+08:00 recover_time 2025-12-02T06:34:47+08:00
+HSET alarm_state_cache:{ID_0049} alarm_id ID_0049 station_id H0049 alarm_type 标准 alarm_status process_status trigger_time 2025-01-05T08:41:58+08:00 recover_time 2025-01-05T08:41:58+08:00
+HSET alarm_state_cache:{ID_0050} alarm_id ID_0050 station_id H0050 alarm_type 加急 alarm_status process_status trigger_time 2025-02-08T10:48:09+08:00 recover_time 2025-02-08T10:48:09+08:00
+HSET alarm_state_cache:{ID_0051} alarm_id ID_0051 station_id H0051 alarm_type 冷链 alarm_status process_status trigger_time 2025-03-11T12:55:20+08:00 recover_time 2025-03-11T12:55:20+08:00
+HSET alarm_state_cache:{ID_0052} alarm_id ID_0052 station_id H0052 alarm_type 电商 alarm_status process_status trigger_time 2025-04-14T14:02:31+08:00 recover_time 2025-04-14T14:02:31+08:00
+HSET alarm_state_cache:{ID_0053} alarm_id ID_0053 station_id H0053 alarm_type 医药 alarm_status process_status trigger_time 2025-05-17T16:09:42+08:00 recover_time 2025-05-17T16:09:42+08:00
+HSET alarm_state_cache:{ID_0054} alarm_id ID_0054 station_id H0054 alarm_type 工业品 alarm_status process_status trigger_time 2025-06-20T18:16:53+08:00 recover_time 2025-06-20T18:16:53+08:00
+HSET alarm_state_cache:{ID_0055} alarm_id ID_0055 station_id H0055 alarm_type 零担 alarm_status process_status trigger_time 2025-07-23T20:23:04+08:00 recover_time 2025-07-23T20:23:04+08:00
+HSET alarm_state_cache:{ID_0056} alarm_id ID_0056 station_id H0056 alarm_type 整车 alarm_status process_status trigger_time 2025-08-26T22:30:15+08:00 recover_time 2025-08-26T22:30:15+08:00
+HSET alarm_state_cache:{ID_0057} alarm_id ID_0057 station_id H0057 alarm_type 标准 alarm_status process_status trigger_time 2025-09-01T00:37:26+08:00 recover_time 2025-09-01T00:37:26+08:00
+HSET alarm_state_cache:{ID_0058} alarm_id ID_0058 station_id H0058 alarm_type 加急 alarm_status process_status trigger_time 2025-10-04T02:44:37+08:00 recover_time 2025-10-04T02:44:37+08:00
+HSET alarm_state_cache:{ID_0059} alarm_id ID_0059 station_id H0059 alarm_type 冷链 alarm_status process_status trigger_time 2025-11-07T04:51:48+08:00 recover_time 2025-11-07T04:51:48+08:00
+HSET alarm_state_cache:{ID_0060} alarm_id ID_0060 station_id H0060 alarm_type 电商 alarm_status process_status trigger_time 2025-12-10T06:58:59+08:00 recover_time 2025-12-10T06:58:59+08:00
+HSET alarm_state_cache:{ID_0061} alarm_id ID_0061 station_id H0061 alarm_type 医药 alarm_status process_status trigger_time 2025-01-13T08:05:10+08:00 recover_time 2025-01-13T08:05:10+08:00
+HSET alarm_state_cache:{ID_0062} alarm_id ID_0062 station_id H0062 alarm_type 工业品 alarm_status process_status trigger_time 2025-02-16T10:12:21+08:00 recover_time 2025-02-16T10:12:21+08:00
+HSET alarm_state_cache:{ID_0063} alarm_id ID_0063 station_id H0063 alarm_type 零担 alarm_status process_status trigger_time 2025-03-19T12:19:32+08:00 recover_time 2025-03-19T12:19:32+08:00
+HSET alarm_state_cache:{ID_0064} alarm_id ID_0064 station_id H0064 alarm_type 整车 alarm_status process_status trigger_time 2025-04-22T14:26:43+08:00 recover_time 2025-04-22T14:26:43+08:00
+HSET alarm_state_cache:{ID_0065} alarm_id ID_0065 station_id H0065 alarm_type 标准 alarm_status process_status trigger_time 2025-05-25T16:33:54+08:00 recover_time 2025-05-25T16:33:54+08:00
+HSET alarm_state_cache:{ID_0066} alarm_id ID_0066 station_id H0066 alarm_type 加急 alarm_status process_status trigger_time 2025-06-28T18:40:05+08:00 recover_time 2025-06-28T18:40:05+08:00
+HSET alarm_state_cache:{ID_0067} alarm_id ID_0067 station_id H0067 alarm_type 冷链 alarm_status process_status trigger_time 2025-07-03T20:47:16+08:00 recover_time 2025-07-03T20:47:16+08:00
+HSET alarm_state_cache:{ID_0068} alarm_id ID_0068 station_id H0068 alarm_type 电商 alarm_status process_status trigger_time 2025-08-06T22:54:27+08:00 recover_time 2025-08-06T22:54:27+08:00
+HSET alarm_state_cache:{ID_0069} alarm_id ID_0069 station_id H0069 alarm_type 医药 alarm_status process_status trigger_time 2025-09-09T00:01:38+08:00 recover_time 2025-09-09T00:01:38+08:00
+HSET alarm_state_cache:{ID_0070} alarm_id ID_0070 station_id H0070 alarm_type 工业品 alarm_status process_status trigger_time 2025-10-12T02:08:49+08:00 recover_time 2025-10-12T02:08:49+08:00
+HSET alarm_state_cache:{ID_0071} alarm_id ID_0071 station_id H0071 alarm_type 零担 alarm_status process_status trigger_time 2025-11-15T04:15:00+08:00 recover_time 2025-11-15T04:15:00+08:00
+HSET alarm_state_cache:{ID_0072} alarm_id ID_0072 station_id H0072 alarm_type 整车 alarm_status process_status trigger_time 2025-12-18T06:22:11+08:00 recover_time 2025-12-18T06:22:11+08:00
+HSET alarm_state_cache:{ID_0073} alarm_id ID_0073 station_id H0073 alarm_type 标准 alarm_status process_status trigger_time 2025-01-21T08:29:22+08:00 recover_time 2025-01-21T08:29:22+08:00
+HSET alarm_state_cache:{ID_0074} alarm_id ID_0074 station_id H0074 alarm_type 加急 alarm_status process_status trigger_time 2025-02-24T10:36:33+08:00 recover_time 2025-02-24T10:36:33+08:00
+HSET alarm_state_cache:{ID_0075} alarm_id ID_0075 station_id H0075 alarm_type 冷链 alarm_status process_status trigger_time 2025-03-27T12:43:44+08:00 recover_time 2025-03-27T12:43:44+08:00
+HSET alarm_state_cache:{ID_0076} alarm_id ID_0076 station_id H0076 alarm_type 电商 alarm_status process_status trigger_time 2025-04-02T14:50:55+08:00 recover_time 2025-04-02T14:50:55+08:00
+HSET alarm_state_cache:{ID_0077} alarm_id ID_0077 station_id H0077 alarm_type 医药 alarm_status process_status trigger_time 2025-05-05T16:57:06+08:00 recover_time 2025-05-05T16:57:06+08:00
+HSET alarm_state_cache:{ID_0078} alarm_id ID_0078 station_id H0078 alarm_type 工业品 alarm_status process_status trigger_time 2025-06-08T18:04:17+08:00 recover_time 2025-06-08T18:04:17+08:00
+HSET alarm_state_cache:{ID_0079} alarm_id ID_0079 station_id H0079 alarm_type 零担 alarm_status process_status trigger_time 2025-07-11T20:11:28+08:00 recover_time 2025-07-11T20:11:28+08:00
+HSET alarm_state_cache:{ID_0080} alarm_id ID_0080 station_id H0080 alarm_type 整车 alarm_status process_status trigger_time 2025-08-14T22:18:39+08:00 recover_time 2025-08-14T22:18:39+08:00
+HSET alarm_state_cache:{ID_0081} alarm_id ID_0081 station_id H0081 alarm_type 标准 alarm_status process_status trigger_time 2025-09-17T00:25:50+08:00 recover_time 2025-09-17T00:25:50+08:00
+HSET alarm_state_cache:{ID_0082} alarm_id ID_0082 station_id H0082 alarm_type 加急 alarm_status process_status trigger_time 2025-10-20T02:32:01+08:00 recover_time 2025-10-20T02:32:01+08:00
+HSET alarm_state_cache:{ID_0083} alarm_id ID_0083 station_id H0083 alarm_type 冷链 alarm_status process_status trigger_time 2025-11-23T04:39:12+08:00 recover_time 2025-11-23T04:39:12+08:00
+HSET alarm_state_cache:{ID_0084} alarm_id ID_0084 station_id H0084 alarm_type 电商 alarm_status process_status trigger_time 2025-12-26T06:46:23+08:00 recover_time 2025-12-26T06:46:23+08:00
+HSET alarm_state_cache:{ID_0085} alarm_id ID_0085 station_id H0085 alarm_type 医药 alarm_status process_status trigger_time 2025-01-01T08:53:34+08:00 recover_time 2025-01-01T08:53:34+08:00
+HSET alarm_state_cache:{ID_0086} alarm_id ID_0086 station_id H0086 alarm_type 工业品 alarm_status process_status trigger_time 2025-02-04T10:00:45+08:00 recover_time 2025-02-04T10:00:45+08:00
+HSET alarm_state_cache:{ID_0087} alarm_id ID_0087 station_id H0087 alarm_type 零担 alarm_status process_status trigger_time 2025-03-07T12:07:56+08:00 recover_time 2025-03-07T12:07:56+08:00
+HSET alarm_state_cache:{ID_0088} alarm_id ID_0088 station_id H0088 alarm_type 整车 alarm_status process_status trigger_time 2025-04-10T14:14:07+08:00 recover_time 2025-04-10T14:14:07+08:00
+EXPIRE pending_sort_queue:{H0001} 7200
+EXPIRE pending_sort_queue:{H0002} 7200
+EXPIRE pending_sort_queue:{H0003} 7200
+EXPIRE pending_sort_queue:{H0004} 7200
+EXPIRE pending_sort_queue:{H0005} 7200
+EXPIRE pending_sort_queue:{H0006} 7200
+EXPIRE pending_sort_queue:{H0007} 7200
+EXPIRE pending_sort_queue:{H0008} 7200
+EXPIRE pending_sort_queue:{H0009} 7200
+EXPIRE pending_sort_queue:{H0010} 7200
+EXPIRE pending_sort_queue:{H0011} 7200
+EXPIRE pending_sort_queue:{H0012} 7200
+EXPIRE pending_sort_queue:{H0013} 7200
+EXPIRE pending_sort_queue:{H0014} 7200
+EXPIRE pending_sort_queue:{H0015} 7200
+EXPIRE pending_sort_queue:{H0016} 7200
+EXPIRE pending_sort_queue:{H0017} 7200
+EXPIRE pending_sort_queue:{H0018} 7200
+EXPIRE pending_sort_queue:{H0019} 7200
+EXPIRE pending_sort_queue:{H0020} 7200
+EXPIRE pending_sort_queue:{H0021} 7200
+EXPIRE pending_sort_queue:{H0022} 7200
+EXPIRE pending_sort_queue:{H0023} 7200
+EXPIRE pending_sort_queue:{H0024} 7200
+EXPIRE pending_sort_queue:{H0025} 7200
+EXPIRE pending_sort_queue:{H0026} 7200
+EXPIRE pending_sort_queue:{H0027} 7200
+EXPIRE pending_sort_queue:{H0028} 7200
+EXPIRE pending_sort_queue:{H0029} 7200
+EXPIRE pending_sort_queue:{H0030} 7200
+EXPIRE pending_sort_queue:{H0031} 7200
+EXPIRE pending_sort_queue:{H0032} 7200
+EXPIRE pending_sort_queue:{H0033} 7200
+EXPIRE pending_sort_queue:{H0034} 7200
+EXPIRE pending_sort_queue:{H0035} 7200
+EXPIRE pending_sort_queue:{H0036} 7200
+EXPIRE pending_sort_queue:{H0037} 7200
+EXPIRE pending_sort_queue:{H0038} 7200
+EXPIRE pending_sort_queue:{H0039} 7200
+EXPIRE pending_sort_queue:{H0040} 7200
+EXPIRE pending_sort_queue:{H0041} 7200
+EXPIRE pending_sort_queue:{H0042} 7200
+EXPIRE pending_sort_queue:{H0043} 7200
+EXPIRE pending_sort_queue:{H0044} 7200
+EXPIRE pending_sort_queue:{H0045} 7200
+EXPIRE pending_sort_queue:{H0046} 7200
+EXPIRE pending_sort_queue:{H0047} 7200
+EXPIRE pending_sort_queue:{H0048} 7200
+EXPIRE pending_sort_queue:{H0049} 7200
+EXPIRE pending_sort_queue:{H0050} 7200
+EXPIRE pending_sort_queue:{H0051} 7200
+EXPIRE pending_sort_queue:{H0052} 7200
+EXPIRE pending_sort_queue:{H0053} 7200
+EXPIRE pending_sort_queue:{H0054} 7200
+EXPIRE pending_sort_queue:{H0055} 7200
+EXPIRE pending_sort_queue:{H0056} 7200
+EXPIRE pending_sort_queue:{H0057} 7200
+EXPIRE pending_sort_queue:{H0058} 7200
+EXPIRE pending_sort_queue:{H0059} 7200
+EXPIRE pending_sort_queue:{H0060} 7200
+EXPIRE pending_sort_queue:{H0061} 7200
+EXPIRE pending_sort_queue:{H0062} 7200
+EXPIRE pending_sort_queue:{H0063} 7200
+EXPIRE pending_sort_queue:{H0064} 7200
+EXPIRE pending_sort_queue:{H0065} 7200
+EXPIRE pending_sort_queue:{H0066} 7200
+EXPIRE pending_sort_queue:{H0067} 7200
+EXPIRE pending_sort_queue:{H0068} 7200
+EXPIRE pending_sort_queue:{H0069} 7200
+EXPIRE pending_sort_queue:{H0070} 7200
+EXPIRE pending_sort_queue:{H0071} 7200
+EXPIRE pending_sort_queue:{H0072} 7200
+EXPIRE pending_sort_queue:{H0073} 7200
+EXPIRE pending_sort_queue:{H0074} 7200
+EXPIRE pending_sort_queue:{H0075} 7200
+EXPIRE pending_sort_queue:{H0076} 7200
+EXPIRE pending_sort_queue:{H0077} 7200
+EXPIRE pending_sort_queue:{H0078} 7200
+EXPIRE pending_sort_queue:{H0079} 7200
+EXPIRE pending_sort_queue:{H0080} 7200
+EXPIRE pending_sort_queue:{H0081} 7200
+EXPIRE pending_sort_queue:{H0082} 7200
+EXPIRE pending_sort_queue:{H0083} 7200
+EXPIRE pending_sort_queue:{H0084} 7200
+EXPIRE pending_sort_queue:{H0085} 7200
+EXPIRE pending_sort_queue:{H0086} 7200
+EXPIRE pending_sort_queue:{H0087} 7200
+EXPIRE pending_sort_queue:{H0088} 7200
+EXPIRE node_throughput_state:{H0001} 600
+EXPIRE node_throughput_state:{H0002} 600
+EXPIRE node_throughput_state:{H0003} 600
+EXPIRE node_throughput_state:{H0004} 600
+EXPIRE node_throughput_state:{H0005} 600
+EXPIRE node_throughput_state:{H0006} 600
+EXPIRE node_throughput_state:{H0007} 600
+EXPIRE node_throughput_state:{H0008} 600
+EXPIRE node_throughput_state:{H0009} 600
+EXPIRE node_throughput_state:{H0010} 600
+EXPIRE node_throughput_state:{H0011} 600
+EXPIRE node_throughput_state:{H0012} 600
+EXPIRE node_throughput_state:{H0013} 600
+EXPIRE node_throughput_state:{H0014} 600
+EXPIRE node_throughput_state:{H0015} 600
+EXPIRE node_throughput_state:{H0016} 600
+EXPIRE node_throughput_state:{H0017} 600
+EXPIRE node_throughput_state:{H0018} 600
+EXPIRE node_throughput_state:{H0019} 600
+EXPIRE node_throughput_state:{H0020} 600
+EXPIRE node_throughput_state:{H0021} 600
+EXPIRE node_throughput_state:{H0022} 600
+EXPIRE node_throughput_state:{H0023} 600
+EXPIRE node_throughput_state:{H0024} 600
+EXPIRE node_throughput_state:{H0025} 600
+EXPIRE node_throughput_state:{H0026} 600
+EXPIRE node_throughput_state:{H0027} 600
+EXPIRE node_throughput_state:{H0028} 600
+EXPIRE node_throughput_state:{H0029} 600
+EXPIRE node_throughput_state:{H0030} 600
+EXPIRE node_throughput_state:{H0031} 600
+EXPIRE node_throughput_state:{H0032} 600
+EXPIRE node_throughput_state:{H0033} 600
+EXPIRE node_throughput_state:{H0034} 600
+EXPIRE node_throughput_state:{H0035} 600
+EXPIRE node_throughput_state:{H0036} 600
+EXPIRE node_throughput_state:{H0037} 600
+EXPIRE node_throughput_state:{H0038} 600
+EXPIRE node_throughput_state:{H0039} 600
+EXPIRE node_throughput_state:{H0040} 600
+EXPIRE node_throughput_state:{H0041} 600
+EXPIRE node_throughput_state:{H0042} 600
+EXPIRE node_throughput_state:{H0043} 600
+EXPIRE node_throughput_state:{H0044} 600
+EXPIRE node_throughput_state:{H0045} 600
+EXPIRE node_throughput_state:{H0046} 600
+EXPIRE node_throughput_state:{H0047} 600
+EXPIRE node_throughput_state:{H0048} 600
+EXPIRE node_throughput_state:{H0049} 600
+EXPIRE node_throughput_state:{H0050} 600
+EXPIRE node_throughput_state:{H0051} 600
+EXPIRE node_throughput_state:{H0052} 600
+EXPIRE node_throughput_state:{H0053} 600
+EXPIRE node_throughput_state:{H0054} 600
+EXPIRE node_throughput_state:{H0055} 600
+EXPIRE node_throughput_state:{H0056} 600
+EXPIRE node_throughput_state:{H0057} 600
+EXPIRE node_throughput_state:{H0058} 600
+EXPIRE node_throughput_state:{H0059} 600
+EXPIRE node_throughput_state:{H0060} 600
+EXPIRE node_throughput_state:{H0061} 600
+EXPIRE node_throughput_state:{H0062} 600
+EXPIRE node_throughput_state:{H0063} 600
+EXPIRE node_throughput_state:{H0064} 600
+EXPIRE node_throughput_state:{H0065} 600
+EXPIRE node_throughput_state:{H0066} 600
+EXPIRE node_throughput_state:{H0067} 600
+EXPIRE node_throughput_state:{H0068} 600
+EXPIRE node_throughput_state:{H0069} 600
+EXPIRE node_throughput_state:{H0070} 600
+EXPIRE node_throughput_state:{H0071} 600
+EXPIRE node_throughput_state:{H0072} 600
+EXPIRE node_throughput_state:{H0073} 600
+EXPIRE node_throughput_state:{H0074} 600
+EXPIRE node_throughput_state:{H0075} 600
+EXPIRE node_throughput_state:{H0076} 600
+EXPIRE node_throughput_state:{H0077} 600
+EXPIRE node_throughput_state:{H0078} 600
+EXPIRE node_throughput_state:{H0079} 600
+EXPIRE node_throughput_state:{H0080} 600
+EXPIRE node_throughput_state:{H0081} 600
+EXPIRE node_throughput_state:{H0082} 600
+EXPIRE node_throughput_state:{H0083} 600
+EXPIRE node_throughput_state:{H0084} 600
+EXPIRE node_throughput_state:{H0085} 600
+EXPIRE node_throughput_state:{H0086} 600
+EXPIRE node_throughput_state:{H0087} 600
+EXPIRE node_throughput_state:{H0088} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0001} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0002} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0003} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0004} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0005} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0006} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0007} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0008} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0009} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0010} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0011} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0012} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0013} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0014} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0015} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0016} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0017} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0018} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0019} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0020} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0021} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0022} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0023} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0024} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0025} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0026} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0027} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0028} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0029} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0030} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0031} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0032} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0033} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0034} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0035} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0036} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0037} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0038} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0039} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0040} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0041} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0042} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0043} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0044} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0045} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0046} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0047} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0048} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0049} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0050} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0051} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0052} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0053} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0054} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0055} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0056} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0057} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0058} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0059} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0060} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0061} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0062} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0063} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0064} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0065} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0066} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0067} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0068} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0069} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0070} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0071} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0072} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0073} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0074} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0075} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0076} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0077} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0078} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0079} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0080} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0081} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0082} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0083} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0084} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0085} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0086} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0087} 600
+EXPIRE machine_status_cache:{DEV_SCAN_0088} 600
+EXPIRE alarm_state_cache:{ID_0001} 7200
+EXPIRE alarm_state_cache:{ID_0002} 7200
+EXPIRE alarm_state_cache:{ID_0003} 7200
+EXPIRE alarm_state_cache:{ID_0004} 7200
+EXPIRE alarm_state_cache:{ID_0005} 7200
+EXPIRE alarm_state_cache:{ID_0006} 7200
+EXPIRE alarm_state_cache:{ID_0007} 7200
+EXPIRE alarm_state_cache:{ID_0008} 7200
+EXPIRE alarm_state_cache:{ID_0009} 7200
+EXPIRE alarm_state_cache:{ID_0010} 7200
+EXPIRE alarm_state_cache:{ID_0011} 7200
+EXPIRE alarm_state_cache:{ID_0012} 7200
+EXPIRE alarm_state_cache:{ID_0013} 7200
+EXPIRE alarm_state_cache:{ID_0014} 7200
+EXPIRE alarm_state_cache:{ID_0015} 7200
+EXPIRE alarm_state_cache:{ID_0016} 7200
+EXPIRE alarm_state_cache:{ID_0017} 7200
+EXPIRE alarm_state_cache:{ID_0018} 7200
+EXPIRE alarm_state_cache:{ID_0019} 7200
+EXPIRE alarm_state_cache:{ID_0020} 7200
+EXPIRE alarm_state_cache:{ID_0021} 7200
+EXPIRE alarm_state_cache:{ID_0022} 7200
+EXPIRE alarm_state_cache:{ID_0023} 7200
+EXPIRE alarm_state_cache:{ID_0024} 7200
+EXPIRE alarm_state_cache:{ID_0025} 7200
+EXPIRE alarm_state_cache:{ID_0026} 7200
+EXPIRE alarm_state_cache:{ID_0027} 7200
+EXPIRE alarm_state_cache:{ID_0028} 7200
+EXPIRE alarm_state_cache:{ID_0029} 7200
+EXPIRE alarm_state_cache:{ID_0030} 7200
+EXPIRE alarm_state_cache:{ID_0031} 7200
+EXPIRE alarm_state_cache:{ID_0032} 7200
+EXPIRE alarm_state_cache:{ID_0033} 7200
+EXPIRE alarm_state_cache:{ID_0034} 7200
+EXPIRE alarm_state_cache:{ID_0035} 7200
+EXPIRE alarm_state_cache:{ID_0036} 7200
+EXPIRE alarm_state_cache:{ID_0037} 7200
+EXPIRE alarm_state_cache:{ID_0038} 7200
+EXPIRE alarm_state_cache:{ID_0039} 7200
+EXPIRE alarm_state_cache:{ID_0040} 7200
+EXPIRE alarm_state_cache:{ID_0041} 7200
+EXPIRE alarm_state_cache:{ID_0042} 7200
+EXPIRE alarm_state_cache:{ID_0043} 7200
+EXPIRE alarm_state_cache:{ID_0044} 7200
+EXPIRE alarm_state_cache:{ID_0045} 7200
+EXPIRE alarm_state_cache:{ID_0046} 7200
+EXPIRE alarm_state_cache:{ID_0047} 7200
+EXPIRE alarm_state_cache:{ID_0048} 7200
+EXPIRE alarm_state_cache:{ID_0049} 7200
+EXPIRE alarm_state_cache:{ID_0050} 7200
+EXPIRE alarm_state_cache:{ID_0051} 7200
+EXPIRE alarm_state_cache:{ID_0052} 7200
+EXPIRE alarm_state_cache:{ID_0053} 7200
+EXPIRE alarm_state_cache:{ID_0054} 7200
+EXPIRE alarm_state_cache:{ID_0055} 7200
+EXPIRE alarm_state_cache:{ID_0056} 7200
+EXPIRE alarm_state_cache:{ID_0057} 7200
+EXPIRE alarm_state_cache:{ID_0058} 7200
+EXPIRE alarm_state_cache:{ID_0059} 7200
+EXPIRE alarm_state_cache:{ID_0060} 7200
+EXPIRE alarm_state_cache:{ID_0061} 7200
+EXPIRE alarm_state_cache:{ID_0062} 7200
+EXPIRE alarm_state_cache:{ID_0063} 7200
+EXPIRE alarm_state_cache:{ID_0064} 7200
+EXPIRE alarm_state_cache:{ID_0065} 7200
+EXPIRE alarm_state_cache:{ID_0066} 7200
+EXPIRE alarm_state_cache:{ID_0067} 7200
+EXPIRE alarm_state_cache:{ID_0068} 7200
+EXPIRE alarm_state_cache:{ID_0069} 7200
+EXPIRE alarm_state_cache:{ID_0070} 7200
+EXPIRE alarm_state_cache:{ID_0071} 7200
+EXPIRE alarm_state_cache:{ID_0072} 7200
+EXPIRE alarm_state_cache:{ID_0073} 7200
+EXPIRE alarm_state_cache:{ID_0074} 7200
+EXPIRE alarm_state_cache:{ID_0075} 7200
+EXPIRE alarm_state_cache:{ID_0076} 7200
+EXPIRE alarm_state_cache:{ID_0077} 7200
+EXPIRE alarm_state_cache:{ID_0078} 7200
+EXPIRE alarm_state_cache:{ID_0079} 7200
+EXPIRE alarm_state_cache:{ID_0080} 7200
+EXPIRE alarm_state_cache:{ID_0081} 7200
+EXPIRE alarm_state_cache:{ID_0082} 7200
+EXPIRE alarm_state_cache:{ID_0083} 7200
+EXPIRE alarm_state_cache:{ID_0084} 7200
+EXPIRE alarm_state_cache:{ID_0085} 7200
+EXPIRE alarm_state_cache:{ID_0086} 7200
+EXPIRE alarm_state_cache:{ID_0087} 7200
+EXPIRE alarm_state_cache:{ID_0088} 7200

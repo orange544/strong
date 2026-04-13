@@ -10,8 +10,7 @@ CREATE TABLE IF NOT EXISTS local_movie (
   douban_votes INTEGER,
   release_date TEXT,
   year INTEGER,
-  tags TEXT,
-  updated_time TEXT NOT NULL DEFAULT (datetime('now'))
+  tags TEXT
 );
 
 CREATE TABLE IF NOT EXISTS local_person (
@@ -28,8 +27,7 @@ CREATE TABLE IF NOT EXISTS local_person (
 
 CREATE TABLE IF NOT EXISTS local_user (
   user_md5 TEXT PRIMARY KEY,
-  user_nickname TEXT,
-  created_time TEXT NOT NULL DEFAULT (datetime('now'))
+  user_nickname TEXT
 );
 
 CREATE TABLE IF NOT EXISTS local_movie_person (
@@ -76,7 +74,6 @@ CREATE TABLE IF NOT EXISTS movie_meta_cache (
   movie_id INTEGER NOT NULL,
   meta_key TEXT NOT NULL,
   meta_value TEXT,
-  updated_time TEXT NOT NULL DEFAULT (datetime('now')),
   PRIMARY KEY (movie_id, meta_key),
   FOREIGN KEY(movie_id) REFERENCES local_movie(movie_id)
 );
@@ -120,17 +117,17 @@ INSERT INTO local_person (person_id, name, sex, name_en, profession, biography) 
 (9001112, '汤姆·克鲁斯', '男', 'Tom Cruise', '演员', '美国演员。'),
 (1316761, '张小斐', '女', NULL, '演员', '中国电影演员。');
 
-INSERT INTO local_user (user_md5, user_nickname, created_time) VALUES
-('0ab7e3efacd56983f16503572d2b9915', '恋丶你灬', '2025-01-03 10:22:10'),
-('5f4dcc3b5aa765d61d8327deb882cf99', '风继续吹', '2025-01-18 13:09:45'),
-('9e107d9d372bb6826bd81d3542a419d6', '月落乌啼', '2025-02-02 19:11:30'),
-('e10adc3949ba59abbe56e057f20f883e', '银河补习班', '2025-02-10 08:31:22'),
-('25d55ad283aa400af464c76d713c07ad', '海边的曼彻斯特', '2025-02-20 21:46:18'),
-('d8578edf8458ce06fbc5bb76a58c5ca4', '花火', '2025-03-01 09:05:42'),
-('96e79218965eb72c92a549dd5a330112', '逆光飞行', '2025-03-11 17:27:09'),
-('6cb75f652a9b52798eb6cf2201057c73', '河畔青芒', '2025-03-20 15:16:50'),
-('c33367701511b4f6020ec61ded352059', '等风来', '2025-03-26 11:03:27'),
-('b59c67bf196a4758191e42f76670ceba', '南方有嘉木', '2025-04-03 20:40:11');
+INSERT INTO local_user (user_md5, user_nickname) VALUES
+('0ab7e3efacd56983f16503572d2b9915', '恋丶你灬'),
+('5f4dcc3b5aa765d61d8327deb882cf99', '风继续吹'),
+('9e107d9d372bb6826bd81d3542a419d6', '月落乌啼'),
+('e10adc3949ba59abbe56e057f20f883e', '银河补习班'),
+('25d55ad283aa400af464c76d713c07ad', '海边的曼彻斯特'),
+('d8578edf8458ce06fbc5bb76a58c5ca4', '花火'),
+('96e79218965eb72c92a549dd5a330112', '逆光飞行'),
+('6cb75f652a9b52798eb6cf2201057c73', '河畔青芒'),
+('c33367701511b4f6020ec61ded352059', '等风来'),
+('b59c67bf196a4758191e42f76670ceba', '南方有嘉木');
 
 INSERT INTO local_movie_person (movie_id, person_id, relation_type) VALUES
 (35267208, 1000525, 'ACTOR'),
@@ -180,14 +177,14 @@ INSERT INTO local_schedule (movie_id, cinema_name, hall_name, start_time, ticket
 (90000004, '北京朝阳万达影城', '2号厅', '2026-03-25 19:30:00', 66.00, 'ON_SALE'),
 (34841067, '成都太古里CGV影城', '巨幕厅', '2026-03-25 20:30:00', 52.00, 'ON_SALE');
 
-INSERT INTO movie_meta_cache (movie_id, meta_key, meta_value, updated_time) VALUES
-(35267208, 'source', 'douban_dataset', '2026-03-23 19:20:00'),
-(35267208, 'cache_version', 'v2026.03.23', '2026-03-23 19:20:00'),
-(36779979, 'source', 'douban_dataset', '2026-03-23 19:20:00'),
-(36779979, 'cache_version', 'v2026.03.23', '2026-03-23 19:20:00'),
-(90000001, 'source', 'douban_dataset', '2026-03-23 19:20:00'),
-(90000001, 'cache_version', 'v2026.03.23', '2026-03-23 19:20:00'),
-(90000002, 'source', 'douban_dataset', '2026-03-23 19:20:00'),
-(90000002, 'cache_version', 'v2026.03.23', '2026-03-23 19:20:00'),
-(25845392, 'source', 'douban_dataset', '2026-03-23 19:20:00'),
-(25845392, 'cache_version', 'v2026.03.23', '2026-03-23 19:20:00');
+INSERT INTO movie_meta_cache (movie_id, meta_key, meta_value) VALUES
+(35267208, 'source', 'douban_dataset'),
+(35267208, 'cache_version', 'v2026.03.23'),
+(36779979, 'source', 'douban_dataset'),
+(36779979, 'cache_version', 'v2026.03.23'),
+(90000001, 'source', 'douban_dataset'),
+(90000001, 'cache_version', 'v2026.03.23'),
+(90000002, 'source', 'douban_dataset'),
+(90000002, 'cache_version', 'v2026.03.23'),
+(25845392, 'source', 'douban_dataset'),
+(25845392, 'cache_version', 'v2026.03.23');

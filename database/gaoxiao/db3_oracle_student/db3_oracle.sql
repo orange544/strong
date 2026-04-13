@@ -1,0 +1,138 @@
+BEGIN EXECUTE IMMEDIATE 'DROP TABLE graduation_audit CASCADE CONSTRAINTS'; EXCEPTION WHEN OTHERS THEN IF SQLCODE != -942 THEN RAISE; END IF; END;
+/
+BEGIN EXECUTE IMMEDIATE 'DROP TABLE student_status_change CASCADE CONSTRAINTS'; EXCEPTION WHEN OTHERS THEN IF SQLCODE != -942 THEN RAISE; END IF; END;
+/
+BEGIN EXECUTE IMMEDIATE 'DROP TABLE registration_record CASCADE CONSTRAINTS'; EXCEPTION WHEN OTHERS THEN IF SQLCODE != -942 THEN RAISE; END IF; END;
+/
+BEGIN EXECUTE IMMEDIATE 'DROP TABLE program_course_require CASCADE CONSTRAINTS'; EXCEPTION WHEN OTHERS THEN IF SQLCODE != -942 THEN RAISE; END IF; END;
+/
+BEGIN EXECUTE IMMEDIATE 'DROP TABLE training_program CASCADE CONSTRAINTS'; EXCEPTION WHEN OTHERS THEN IF SQLCODE != -942 THEN RAISE; END IF; END;
+/
+BEGIN EXECUTE IMMEDIATE 'DROP TABLE class_info CASCADE CONSTRAINTS'; EXCEPTION WHEN OTHERS THEN IF SQLCODE != -942 THEN RAISE; END IF; END;
+/
+BEGIN EXECUTE IMMEDIATE 'DROP TABLE major_info CASCADE CONSTRAINTS'; EXCEPTION WHEN OTHERS THEN IF SQLCODE != -942 THEN RAISE; END IF; END;
+/
+BEGIN EXECUTE IMMEDIATE 'DROP TABLE student_status CASCADE CONSTRAINTS'; EXCEPTION WHEN OTHERS THEN IF SQLCODE != -942 THEN RAISE; END IF; END;
+/
+BEGIN EXECUTE IMMEDIATE 'DROP TABLE student_basic CASCADE CONSTRAINTS'; EXCEPTION WHEN OTHERS THEN IF SQLCODE != -942 THEN RAISE; END IF; END;
+/
+
+CREATE TABLE student_basic (
+  student_id VARCHAR2(32) PRIMARY KEY,
+  student_no VARCHAR2(20) UNIQUE NOT NULL,
+  student_name VARCHAR2(50) NOT NULL,
+  gender VARCHAR2(10) NOT NULL,
+  student_age NUMBER(3) NOT NULL,
+  cert_no VARCHAR2(18) UNIQUE NOT NULL,
+  mobile VARCHAR2(20) NOT NULL,
+  college_id VARCHAR2(20) NOT NULL,
+  major_id VARCHAR2(20) NOT NULL,
+  grade_year NUMBER(4) NOT NULL,
+  status VARCHAR2(30) NOT NULL
+);
+
+CREATE TABLE student_status (
+  status_id VARCHAR2(32) PRIMARY KEY,
+  student_id VARCHAR2(32) NOT NULL REFERENCES student_basic(student_id),
+  status_code VARCHAR2(20) NOT NULL,
+  status_desc VARCHAR2(100) NOT NULL,
+  effective_date DATE NOT NULL
+);
+
+CREATE TABLE major_info (
+  major_id VARCHAR2(20) PRIMARY KEY,
+  major_name VARCHAR2(100) NOT NULL,
+  college_id VARCHAR2(20) NOT NULL,
+  degree_type VARCHAR2(20) NOT NULL,
+  major_status VARCHAR2(20) NOT NULL
+);
+
+CREATE TABLE class_info (
+  class_id VARCHAR2(20) PRIMARY KEY,
+  class_name VARCHAR2(80) NOT NULL,
+  major_id VARCHAR2(20) NOT NULL REFERENCES major_info(major_id),
+  grade_year NUMBER(4) NOT NULL,
+  counselor_id VARCHAR2(20) NOT NULL
+);
+
+CREATE TABLE training_program (
+  program_id VARCHAR2(32) PRIMARY KEY,
+  major_id VARCHAR2(20) NOT NULL REFERENCES major_info(major_id),
+  program_name VARCHAR2(150) NOT NULL,
+  total_credit NUMBER(5,1) NOT NULL,
+  effective_grade NUMBER(4) NOT NULL,
+  program_status VARCHAR2(20) NOT NULL
+);
+
+CREATE TABLE program_course_require (
+  require_id VARCHAR2(32) PRIMARY KEY,
+  program_id VARCHAR2(32) NOT NULL REFERENCES training_program(program_id),
+  course_code VARCHAR2(20) NOT NULL,
+  course_name VARCHAR2(120) NOT NULL,
+  required_flag CHAR(1) NOT NULL,
+  credit NUMBER(4,1) NOT NULL
+);
+
+CREATE TABLE registration_record (
+  reg_id VARCHAR2(32) PRIMARY KEY,
+  student_id VARCHAR2(32) NOT NULL REFERENCES student_basic(student_id),
+  term_id VARCHAR2(20) NOT NULL,
+  reg_status VARCHAR2(20) NOT NULL,
+  reg_time DATE NOT NULL
+);
+
+CREATE TABLE student_status_change (
+  change_id VARCHAR2(32) PRIMARY KEY,
+  student_id VARCHAR2(32) NOT NULL REFERENCES student_basic(student_id),
+  from_status VARCHAR2(30) NOT NULL,
+  to_status VARCHAR2(30) NOT NULL,
+  change_reason VARCHAR2(200) NOT NULL,
+  change_date DATE NOT NULL
+);
+
+CREATE TABLE graduation_audit (
+  audit_id VARCHAR2(32) PRIMARY KEY,
+  student_id VARCHAR2(32) NOT NULL REFERENCES student_basic(student_id),
+  expected_grad_date DATE NOT NULL,
+  credit_pass_flag CHAR(1) NOT NULL,
+  thesis_pass_flag CHAR(1) NOT NULL,
+  audit_status VARCHAR2(20) NOT NULL
+);
+
+INSERT INTO student_basic VALUES ('STU_2025_0001','BK20250001','张晨','男',18,'320583200701015612','13812345678','COL_010','MAJ_CS',2025,'在读');
+INSERT INTO student_basic VALUES ('STU_2025_0088','BK20250088','李媛','女',19,'370102200609086527','13988886666','COL_023','MAJ_MATH',2025,'保留入学资格');
+INSERT INTO student_basic VALUES ('STU_2025_1566','BK20251566','王磊','未知',17,'110108200812123216','13766669999','COL_018','MAJ_EE',2025,'休学');
+
+INSERT INTO student_status VALUES ('STS_0001','STU_2025_0001','ON_ROLL','在读',DATE '2025-09-01');
+INSERT INTO student_status VALUES ('STS_0002','STU_2025_0088','RESERVED','保留入学资格',DATE '2025-09-01');
+INSERT INTO student_status VALUES ('STS_0003','STU_2025_1566','SUSPENDED','休学',DATE '2025-11-15');
+
+INSERT INTO major_info VALUES ('MAJ_CS','计算机科学与技术','COL_010','工学','启用');
+INSERT INTO major_info VALUES ('MAJ_MATH','数学与应用数学','COL_023','理学','启用');
+INSERT INTO major_info VALUES ('MAJ_EE','电气工程及其自动化','COL_018','工学','启用');
+
+INSERT INTO class_info VALUES ('CLS_CS01','计科2025级1班','MAJ_CS',2025,'CNS001');
+INSERT INTO class_info VALUES ('CLS_MA01','数应2025级1班','MAJ_MATH',2025,'CNS008');
+INSERT INTO class_info VALUES ('CLS_EE01','电气2025级1班','MAJ_EE',2025,'CNS116');
+
+INSERT INTO training_program VALUES ('TP_0001','MAJ_CS','计算机科学培养方案',160.0,2025,'执行中');
+INSERT INTO training_program VALUES ('TP_0002','MAJ_MATH','数学与应用数学培养方案',155.0,2025,'执行中');
+INSERT INTO training_program VALUES ('TP_0003','MAJ_EE','电气工程培养方案',162.0,2025,'执行中');
+
+INSERT INTO program_course_require VALUES ('PCR_0001','TP_0001','CS101','程序设计基础','Y',4.0);
+INSERT INTO program_course_require VALUES ('PCR_0002','TP_0002','MATH204','高等代数','Y',4.0);
+INSERT INTO program_course_require VALUES ('PCR_0003','TP_0003','EE310','数字电路','Y',3.5);
+
+INSERT INTO registration_record VALUES ('REG_0001','STU_2025_0001','2025-2026-1','已注册',DATE '2025-09-02');
+INSERT INTO registration_record VALUES ('REG_0002','STU_2025_0088','2025-2026-1','暂缓注册',DATE '2025-09-03');
+INSERT INTO registration_record VALUES ('REG_0003','STU_2025_1566','2025-2026-1','休学',DATE '2025-09-05');
+
+INSERT INTO student_status_change VALUES ('SSC_0001','STU_2025_0001','待报到','在读','正常入学',DATE '2025-09-01');
+INSERT INTO student_status_change VALUES ('SSC_0002','STU_2025_0088','待报到','保留入学资格','本人申请',DATE '2025-09-02');
+INSERT INTO student_status_change VALUES ('SSC_0003','STU_2025_1566','在读','休学','健康原因',DATE '2025-11-15');
+
+INSERT INTO graduation_audit VALUES ('GA_0001','STU_2025_0001',DATE '2029-06-30','Y','Y','待毕业');
+INSERT INTO graduation_audit VALUES ('GA_0002','STU_2025_0088',DATE '2030-06-30','N','N','延期');
+INSERT INTO graduation_audit VALUES ('GA_0003','STU_2025_1566',DATE '2030-06-30','N','N','中止');
+
+COMMIT;

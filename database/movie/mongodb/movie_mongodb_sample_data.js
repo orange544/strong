@@ -247,7 +247,6 @@ movieDb.movie_tags.insertMany([
       { name: "春节档", weight: 0.77, source: "ops" }
     ],
     year: 2024,
-    updated_time: ISODate("2026-03-20T09:00:00Z")
   },
   {
     movie_id: NumberLong("35267208"),
@@ -258,7 +257,6 @@ movieDb.movie_tags.insertMany([
       { name: "春节档", weight: 0.69, source: "ops" }
     ],
     year: 2023,
-    updated_time: ISODate("2026-03-20T09:00:00Z")
   },
   {
     movie_id: NumberLong("90000001"),
@@ -268,7 +266,6 @@ movieDb.movie_tags.insertMany([
       { name: "奥斯卡", weight: 0.83, source: "ops" }
     ],
     year: 2023,
-    updated_time: ISODate("2026-03-20T09:00:00Z")
   },
   {
     movie_id: NumberLong("90000002"),
@@ -278,7 +275,6 @@ movieDb.movie_tags.insertMany([
       { name: "IMAX", weight: 0.82, source: "ops" }
     ],
     year: 2024,
-    updated_time: ISODate("2026-03-20T09:00:00Z")
   },
   {
     movie_id: NumberLong("25845392"),
@@ -288,7 +284,6 @@ movieDb.movie_tags.insertMany([
       { name: "历史", weight: 0.76, source: "ugc" }
     ],
     year: 2021,
-    updated_time: ISODate("2026-03-20T09:00:00Z")
   },
   {
     movie_id: NumberLong("90000003"),
@@ -298,7 +293,6 @@ movieDb.movie_tags.insertMany([
       { name: "多元宇宙", weight: 0.88, source: "ops" }
     ],
     year: 2021,
-    updated_time: ISODate("2026-03-20T09:00:00Z")
   },
   {
     movie_id: NumberLong("30474725"),
@@ -308,7 +302,6 @@ movieDb.movie_tags.insertMany([
       { name: "古装", weight: 0.68, source: "ugc" }
     ],
     year: 2023,
-    updated_time: ISODate("2026-03-20T09:00:00Z")
   },
   {
     movie_id: NumberLong("34780991"),
@@ -318,7 +311,6 @@ movieDb.movie_tags.insertMany([
       { name: "封神宇宙", weight: 0.81, source: "ugc" }
     ],
     year: 2023,
-    updated_time: ISODate("2026-03-20T09:00:00Z")
   },
   {
     movie_id: NumberLong("90000004"),
@@ -328,7 +320,6 @@ movieDb.movie_tags.insertMany([
       { name: "续作", weight: 0.79, source: "ops" }
     ],
     year: 2022,
-    updated_time: ISODate("2026-03-20T09:00:00Z")
   },
   {
     movie_id: NumberLong("34841067"),
@@ -338,7 +329,6 @@ movieDb.movie_tags.insertMany([
       { name: "春节档", weight: 0.78, source: "ops" }
     ],
     year: 2021,
-    updated_time: ISODate("2026-03-20T09:00:00Z")
   }
 ]);
 

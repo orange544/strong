@@ -1,0 +1,50 @@
+methods:
+  coma:
+    enabled: true
+    max_n: 0
+    use_instances: false
+    java_xmx: 1024m
+  simflooding:
+    enabled: true
+    coeff_policy: inverse_average
+    formula: formula_c
+  isresmat:
+    enabled: true
+    # External repo mode (subprocess):
+    repo_path: D:/Program Files/BISHE/program/database/valentine_experiments/external/isresmat_repo
+    python_exec: D:/Program Files/BISHE/program/database/valentine_experiments/external/isresmat_venv/Scripts/python.exe
+    timeout_sec: 7200
+    n_trn_cols: 200
+    batch_size: 1
+    num_workers: 0
+    frag_height: 6
+    frag_width: 12
+    learning_rate: 3.0e-5
+    col_name_prob: 0
+    process_mode: 2
+    store_matches: true
+    comment: codex_isresmat
+    extra_args:
+      - --n-val-cols
+      - "10"
+    # Fast path: if set, directly read normalized predictions from this file.
+    prediction_file: ""
+  unicorn:
+    enabled: true
+    repo_path: D:/Program Files/BISHE/program/database/valentine_experiments/external/unicorn_repo
+    timeout_sec: 7200
+    model: deberta_base
+    ckpt: UnicornPlus
+    checkpoint_dir: D:/Program Files/BISHE/program/database/valentine_experiments/external/unicorn_repo/checkpoint
+    batch_size: 32
+    max_seq_length: 128
+    max_values_per_column: 20
+    max_value_chars: 80
+    wmoe: true
+    expertsnum: 6
+    units: 768
+    size_output: 768
+    load_balance: false
+    # Fast path: if set, directly read normalized predictions from this file.
+    prediction_file: ""
+    supports_ranking: true

@@ -1,0 +1,3 @@
+SELECT 1
+SET fieldmap:admission_employment_db.graduate_employment.destination_type 毕业去向类型
+PERSIST fieldmap:admission_employment_db.graduate_employment.destination_type

@@ -1,0 +1,23 @@
+method:
+  name: ours_arch
+
+runtime:
+  semantic_project_root: D:/Program Files/BISHE/program/semantic_unification_from_llm_kg
+  temp_db_root: D:/Program Files/BISHE/program/database/valentine_experiments/experiments/valentine_baselines/outputs/tmp_sqlite/ours_arch_magellan_fast
+  intermediate_root: D:/Program Files/BISHE/program/database/valentine_experiments/experiments/valentine_baselines/outputs/intermediate/ours_arch_magellan_fast
+  write_intermediate: true
+  preserve_temp_db: false
+  seed: 20260409
+  max_fields_per_domain: 0
+  llm_desc_max_workers: 5
+  llm_desc_domain_timeout_sec: 180
+
+runner:
+  default_datasets:
+    - Magellan
+
+evaluation:
+  one_to_one: true
+  top_k: null
+  top_percent: null
+

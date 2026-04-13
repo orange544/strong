@@ -1,0 +1,139 @@
+BEGIN EXECUTE IMMEDIATE 'DROP TABLE refund_record CASCADE CONSTRAINTS'; EXCEPTION WHEN OTHERS THEN IF SQLCODE != -942 THEN RAISE; END IF; END;
+/
+BEGIN EXECUTE IMMEDIATE 'DROP TABLE student_fee_receivable CASCADE CONSTRAINTS'; EXCEPTION WHEN OTHERS THEN IF SQLCODE != -942 THEN RAISE; END IF; END;
+/
+BEGIN EXECUTE IMMEDIATE 'DROP TABLE invoice_info CASCADE CONSTRAINTS'; EXCEPTION WHEN OTHERS THEN IF SQLCODE != -942 THEN RAISE; END IF; END;
+/
+BEGIN EXECUTE IMMEDIATE 'DROP TABLE loan_form CASCADE CONSTRAINTS'; EXCEPTION WHEN OTHERS THEN IF SQLCODE != -942 THEN RAISE; END IF; END;
+/
+BEGIN EXECUTE IMMEDIATE 'DROP TABLE reimbursement_form CASCADE CONSTRAINTS'; EXCEPTION WHEN OTHERS THEN IF SQLCODE != -942 THEN RAISE; END IF; END;
+/
+BEGIN EXECUTE IMMEDIATE 'DROP TABLE payment_record CASCADE CONSTRAINTS'; EXCEPTION WHEN OTHERS THEN IF SQLCODE != -942 THEN RAISE; END IF; END;
+/
+BEGIN EXECUTE IMMEDIATE 'DROP TABLE budget_index CASCADE CONSTRAINTS'; EXCEPTION WHEN OTHERS THEN IF SQLCODE != -942 THEN RAISE; END IF; END;
+/
+BEGIN EXECUTE IMMEDIATE 'DROP TABLE expense_category CASCADE CONSTRAINTS'; EXCEPTION WHEN OTHERS THEN IF SQLCODE != -942 THEN RAISE; END IF; END;
+/
+
+CREATE TABLE expense_category (
+  category_id VARCHAR2(32) PRIMARY KEY,
+  category_code VARCHAR2(32) UNIQUE NOT NULL,
+  category_name VARCHAR2(100) NOT NULL,
+  parent_category_id VARCHAR2(32),
+  category_status VARCHAR2(20) NOT NULL
+);
+
+CREATE TABLE budget_index (
+  budget_id VARCHAR2(32) PRIMARY KEY,
+  budget_year NUMBER(4) NOT NULL,
+  dept_code VARCHAR2(32) NOT NULL,
+  category_id VARCHAR2(32) NOT NULL REFERENCES expense_category(category_id),
+  budget_amount NUMBER(14,2) NOT NULL,
+  used_amount NUMBER(14,2) NOT NULL,
+  budget_status VARCHAR2(20) NOT NULL,
+  approved_date DATE NOT NULL
+);
+
+CREATE TABLE payment_record (
+  payment_id VARCHAR2(32) PRIMARY KEY,
+  pay_no VARCHAR2(32) UNIQUE NOT NULL,
+  payer_type VARCHAR2(20) NOT NULL,
+  payer_id VARCHAR2(32) NOT NULL,
+  payer_name VARCHAR2(50) NOT NULL,
+  amount NUMBER(14,2) NOT NULL,
+  biz_type VARCHAR2(60) NOT NULL,
+  payment_status VARCHAR2(20) NOT NULL,
+  pay_time DATE NOT NULL
+);
+
+CREATE TABLE reimbursement_form (
+  reimburse_id VARCHAR2(32) PRIMARY KEY,
+  form_no VARCHAR2(32) UNIQUE NOT NULL,
+  applicant_id VARCHAR2(32) NOT NULL,
+  applicant_name VARCHAR2(50) NOT NULL,
+  apply_dept VARCHAR2(50) NOT NULL,
+  biz_type VARCHAR2(40) NOT NULL,
+  apply_amount NUMBER(14,2) NOT NULL,
+  submit_time DATE NOT NULL,
+  approve_status VARCHAR2(20) NOT NULL,
+  payment_id VARCHAR2(32) REFERENCES payment_record(payment_id)
+);
+
+CREATE TABLE loan_form (
+  loan_id VARCHAR2(32) PRIMARY KEY,
+  loan_no VARCHAR2(32) UNIQUE NOT NULL,
+  borrower_id VARCHAR2(32) NOT NULL,
+  borrower_name VARCHAR2(50) NOT NULL,
+  loan_amount NUMBER(14,2) NOT NULL,
+  apply_time DATE NOT NULL,
+  due_date DATE NOT NULL,
+  loan_status VARCHAR2(20) NOT NULL,
+  payment_id VARCHAR2(32) REFERENCES payment_record(payment_id)
+);
+
+CREATE TABLE invoice_info (
+  invoice_id VARCHAR2(32) PRIMARY KEY,
+  invoice_no VARCHAR2(32) UNIQUE NOT NULL,
+  reimburse_id VARCHAR2(32) NOT NULL REFERENCES reimbursement_form(reimburse_id),
+  category_id VARCHAR2(32) NOT NULL REFERENCES expense_category(category_id),
+  invoice_amount NUMBER(14,2) NOT NULL,
+  invoice_date DATE NOT NULL,
+  vendor_name VARCHAR2(120) NOT NULL,
+  verify_status VARCHAR2(20) NOT NULL
+);
+
+CREATE TABLE student_fee_receivable (
+  receivable_id VARCHAR2(32) PRIMARY KEY,
+  stu_code VARCHAR2(32) NOT NULL,
+  student_name VARCHAR2(50) NOT NULL,
+  fee_type VARCHAR2(40) NOT NULL,
+  amount_due NUMBER(14,2) NOT NULL,
+  due_term VARCHAR2(20) NOT NULL,
+  due_date DATE NOT NULL,
+  receivable_status VARCHAR2(20) NOT NULL,
+  payment_id VARCHAR2(32) REFERENCES payment_record(payment_id)
+);
+
+CREATE TABLE refund_record (
+  refund_id VARCHAR2(32) PRIMARY KEY,
+  refund_no VARCHAR2(32) UNIQUE NOT NULL,
+  payer_id VARCHAR2(32) NOT NULL,
+  payer_name VARCHAR2(50) NOT NULL,
+  refund_amount NUMBER(14,2) NOT NULL,
+  refund_reason VARCHAR2(120) NOT NULL,
+  refund_status VARCHAR2(20) NOT NULL,
+  refund_time DATE NOT NULL,
+  payment_id VARCHAR2(32) REFERENCES payment_record(payment_id)
+);
+INSERT INTO expense_category VALUES ('ECAT_001', 'TRAVEL_FEE', '差旅费', NULL, '启用');
+INSERT INTO expense_category VALUES ('ECAT_002', 'TEACH_FEE', '教学经费', NULL, '启用');
+INSERT INTO expense_category VALUES ('ECAT_003', 'EQUIP_FEE', '设备采购', NULL, '启用');
+INSERT INTO budget_index VALUES ('BGT_0001',2025,'FIN_OFFICE','ECAT_001',500000.00,185600.00,'执行中',DATE '2025-01-15');
+INSERT INTO budget_index VALUES ('BGT_0002',2025,'ACAD_ADMIN','ECAT_002',860000.00,426500.00,'执行中',DATE '2025-01-15');
+INSERT INTO budget_index VALUES ('BGT_0003',2025,'LAB_CENTER','ECAT_003',1200000.00,768000.00,'执行中',DATE '2025-01-15');
+
+INSERT INTO payment_record VALUES ('PAY_0001','F20250001','teacher','T00021','刘强',12560.00,'项目报销','已支付',DATE '2025-10-12');
+INSERT INTO payment_record VALUES ('PAY_0002','F20250088','student','STU_2025_0088','李媛',1200.00,'学费缴纳','已支付',DATE '2025-09-05');
+INSERT INTO payment_record VALUES ('PAY_0003','F20251566','teacher','T00108','周敏',8600.00,'设备采购付款','审核中',DATE '2025-11-03');
+
+INSERT INTO reimbursement_form VALUES ('RMB_0001','BX20250001','T00021','刘强','科研管理处','项目报销',12560.00,DATE '2025-10-10','已支付','PAY_0001');
+INSERT INTO reimbursement_form VALUES ('RMB_0002','BX20250088','T00108','周敏','实验中心','设备采购',8600.00,DATE '2025-11-02','审核中','PAY_0003');
+INSERT INTO reimbursement_form VALUES ('RMB_0003','BX20251566','T00356','陈浩','教务处','教学材料',4200.00,DATE '2025-09-22','已提交',NULL);
+
+INSERT INTO loan_form VALUES ('LOAN_0001','JK20250001','T00021','刘强',20000.00,DATE '2025-09-15',DATE '2025-12-31','已放款','PAY_0001');
+INSERT INTO loan_form VALUES ('LOAN_0002','JK20250088','STU_2025_0088','李媛',5000.00,DATE '2025-09-20',DATE '2026-06-30','审批中',NULL);
+INSERT INTO loan_form VALUES ('LOAN_0003','JK20251566','T00108','周敏',12000.00,DATE '2025-10-18',DATE '2026-01-31','已放款','PAY_0003');
+
+INSERT INTO invoice_info VALUES ('INV_0001','FP20250001','RMB_0001','ECAT_001',3560.00,DATE '2025-10-09','北京高铁服务有限公司','已核验');
+INSERT INTO invoice_info VALUES ('INV_0002','FP20250088','RMB_0002','ECAT_003',8600.00,DATE '2025-10-31','上海实验设备有限公司','待复核');
+INSERT INTO invoice_info VALUES ('INV_0003','FP20251566','RMB_0003','ECAT_002',4200.00,DATE '2025-09-20','武汉教学用品有限公司','已核验');
+
+INSERT INTO student_fee_receivable VALUES ('SFR_0001','STU_2025_0001','张晨','学费',5800.00,'2025-2026-1',DATE '2025-09-15','待缴费',NULL);
+INSERT INTO student_fee_receivable VALUES ('SFR_0002','STU_2025_0088','李媛','住宿费',1200.00,'2025-2026-1',DATE '2025-09-15','已结清','PAY_0002');
+INSERT INTO student_fee_receivable VALUES ('SFR_0003','STU_2025_1566','王磊','学费',5800.00,'2025-2026-1',DATE '2025-09-15','缓缴',NULL);
+
+INSERT INTO refund_record VALUES ('RFD_0001','TK20250001','STU_2025_0088','李媛',200.00,'退宿押金','已退款',DATE '2025-11-15','PAY_0002');
+INSERT INTO refund_record VALUES ('RFD_0002','TK20250088','T00021','刘强',560.00,'教材重复扣款','已退款',DATE '2025-10-20','PAY_0001');
+INSERT INTO refund_record VALUES ('RFD_0003','TK20251566','T00108','周敏',300.00,'差旅改签','待审核',DATE '2025-11-05','PAY_0003');
+
+COMMIT;

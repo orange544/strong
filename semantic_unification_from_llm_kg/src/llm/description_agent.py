@@ -32,13 +32,15 @@ class FieldDescriptionAgent:
 
     def generate_description(self, field_json: dict[str, Any]) -> dict[str, str]:
         db_name = str(field_json.get("db_name", "")).strip()
+        if not db_name:
+            db_name = str(field_json.get("source_name", "")).strip()
+        if not db_name:
+            db_name = "unknown_db"
         table = str(field_json.get("table", "")).strip()
         field = str(field_json.get("field", "")).strip()
         samples_obj = field_json.get("samples", [])
         samples = ", ".join(str(item) for item in samples_obj) if isinstance(samples_obj, list) else ""
 
-        if not db_name:
-            raise RuntimeError("field_json missing required key: 'db_name'")
         if not table:
             raise RuntimeError("field_json missing required key: 'table'")
         if not field:

@@ -1,0 +1,51 @@
+method:
+  name: ours_sda
+  enabled: true
+  seed: 20260409
+  sampling:
+    max_samples_per_column: 32
+    min_non_empty_samples: 0
+    distinct_values: true
+    shuffle_values: true
+  description:
+    mode: llm
+    max_keywords: 8
+    fail_open_to_rule: false
+    llm:
+      # Keep empty to read from env, aligned with main architecture keys:
+      # LLM_DESC_API_KEY / LLM_DESC_BASE_URL / LLM_DESC_MODEL_NAME
+      # fallback: LLM_API_KEY / LLM_BASE_URL / LLM_MODEL_NAME
+      api_key: ""
+      base_url: ""
+      model_name: ""
+      # Optional: load values from an existing .env file (key=value lines).
+      dotenv_path: D:/Program Files/BISHE/program/semantic_unification_from_llm_kg/.env
+      temperature: 0.2
+      timeout_sec: 45
+      max_retries: 1
+      max_workers: 1
+      domain_timeout_sec: 900
+  aggregation:
+    min_score: 0.0
+    top_k_per_source_column: null
+    weights:
+      name: 0.45
+      values: 0.30
+      description: 0.20
+      type: 0.05
+  outputs:
+    write_intermediate: true
+    intermediate_root: D:/Program Files/BISHE/program/database/valentine_experiments/experiments/valentine_baselines/outputs/intermediate/ours_sda
+
+runner:
+  default_datasets:
+    - Magellan
+    - OpenData
+    - ChEMBL
+    - TPC-DI
+    - Wikidata
+
+evaluation:
+  one_to_one: true
+  top_k: null
+  top_percent: null

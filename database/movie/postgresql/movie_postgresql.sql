@@ -7,8 +7,7 @@ CREATE TABLE genre_dictionary (
   genre_name_zh VARCHAR(64) NOT NULL,
   genre_name_en VARCHAR(64),
   genre_group VARCHAR(32),
-  standard_status VARCHAR(16) NOT NULL DEFAULT 'ACTIVE',
-  created_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+  standard_status VARCHAR(16) NOT NULL DEFAULT 'ACTIVE'
 );
 
 CREATE TABLE country_dictionary (
@@ -16,8 +15,7 @@ CREATE TABLE country_dictionary (
   country_name_zh VARCHAR(64) NOT NULL,
   country_name_en VARCHAR(64),
   region_group VARCHAR(32),
-  standard_status VARCHAR(16) NOT NULL DEFAULT 'ACTIVE',
-  created_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+  standard_status VARCHAR(16) NOT NULL DEFAULT 'ACTIVE'
 );
 
 CREATE TABLE language_dictionary (
@@ -25,8 +23,7 @@ CREATE TABLE language_dictionary (
   language_name_zh VARCHAR(64) NOT NULL,
   language_name_en VARCHAR(64),
   iso_639_1 VARCHAR(8),
-  standard_status VARCHAR(16) NOT NULL DEFAULT 'ACTIVE',
-  created_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+  standard_status VARCHAR(16) NOT NULL DEFAULT 'ACTIVE'
 );
 
 CREATE TABLE actor_master (
@@ -37,8 +34,7 @@ CREATE TABLE actor_master (
   birth_date DATE,
   birth_place VARCHAR(255),
   profession VARCHAR(255),
-  source_system VARCHAR(32) NOT NULL DEFAULT 'douban_dataset',
-  created_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+  source_system VARCHAR(32) NOT NULL DEFAULT 'douban_dataset'
 );
 
 CREATE TABLE director_master (
@@ -49,8 +45,7 @@ CREATE TABLE director_master (
   birth_date DATE,
   birth_place VARCHAR(255),
   profession VARCHAR(255),
-  source_system VARCHAR(32) NOT NULL DEFAULT 'douban_dataset',
-  created_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+  source_system VARCHAR(32) NOT NULL DEFAULT 'douban_dataset'
 );
 
 CREATE TABLE movie_master (
@@ -69,9 +64,7 @@ CREATE TABLE movie_master (
   primary_country_code VARCHAR(16) REFERENCES country_dictionary(country_code),
   primary_language_code VARCHAR(16) REFERENCES language_dictionary(language_code),
   storyline TEXT,
-  source_system VARCHAR(32) NOT NULL DEFAULT 'douban_dataset',
-  created_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+  source_system VARCHAR(32) NOT NULL DEFAULT 'douban_dataset'
 );
 
 CREATE TABLE movie_standard_id (
@@ -82,7 +75,6 @@ CREATE TABLE movie_standard_id (
   standard_movie_code VARCHAR(32) NOT NULL REFERENCES movie_master(standard_movie_code),
   source_name VARCHAR(64),
   is_primary BOOLEAN NOT NULL DEFAULT FALSE,
-  created_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (source_system, source_object, source_id)
 );
 
@@ -93,7 +85,6 @@ CREATE TABLE movie_alias_mapping (
   alias_language_code VARCHAR(16) REFERENCES language_dictionary(language_code),
   alias_type VARCHAR(32) NOT NULL,
   source_system VARCHAR(32) NOT NULL DEFAULT 'douban_dataset',
-  created_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   UNIQUE (movie_id, alias_name)
 );
 
@@ -107,7 +98,6 @@ CREATE TABLE movie_release_version (
   duration_minutes INT,
   is_re_release BOOLEAN NOT NULL DEFAULT FALSE,
   source_system VARCHAR(32) NOT NULL DEFAULT 'ticketing_system',
-  created_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   UNIQUE (movie_id, version_name, region_code, release_date)
 );
 
@@ -159,7 +149,6 @@ CREATE TABLE field_semantic_dictionary (
   source_field VARCHAR(64) NOT NULL,
   example_value VARCHAR(255),
   is_primary BOOLEAN NOT NULL DEFAULT FALSE,
-  created_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   UNIQUE (semantic_name, source_system, source_object, source_field)
 );
 

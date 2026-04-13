@@ -35,8 +35,6 @@ CREATE TABLE IF NOT EXISTS movie_basic (
   year INT,
   actor_ids TEXT,
   director_ids TEXT,
-  created_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   UNIQUE KEY uk_movie_basic_imdb_id (imdb_id)
 ) ENGINE=InnoDB;
 
@@ -45,8 +43,7 @@ CREATE TABLE IF NOT EXISTS cinema (
   cinema_name VARCHAR(255) NOT NULL,
   region_code VARCHAR(32) NOT NULL,
   address VARCHAR(500),
-  cinema_status VARCHAR(16) NOT NULL DEFAULT 'OPEN',
-  created_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+  cinema_status VARCHAR(16) NOT NULL DEFAULT 'OPEN'
 ) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS hall (
@@ -55,7 +52,6 @@ CREATE TABLE IF NOT EXISTS hall (
   hall_name VARCHAR(128) NOT NULL,
   seat_count INT NOT NULL,
   hall_status VARCHAR(16) NOT NULL DEFAULT 'ACTIVE',
-  created_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_hall_cinema FOREIGN KEY (cinema_id) REFERENCES cinema(cinema_id)
 ) ENGINE=InnoDB;
 
@@ -81,7 +77,6 @@ CREATE TABLE IF NOT EXISTS schedule (
   language VARCHAR(32),
   version VARCHAR(32),
   schedule_status VARCHAR(16) NOT NULL DEFAULT 'ON_SALE',
-  created_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_schedule_movie FOREIGN KEY (movie_id) REFERENCES movie_basic(movie_id),
   CONSTRAINT fk_schedule_cinema FOREIGN KEY (cinema_id) REFERENCES cinema(cinema_id),
   CONSTRAINT fk_schedule_hall FOREIGN KEY (hall_id) REFERENCES hall(hall_id),
@@ -114,7 +109,6 @@ CREATE TABLE IF NOT EXISTS payment_record (
   payment_status VARCHAR(16) NOT NULL,
   transaction_no VARCHAR(64),
   payment_time DATETIME,
-  created_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_payment_record_order FOREIGN KEY (order_id) REFERENCES ticket_order(order_id),
   UNIQUE KEY uk_payment_record_transaction_no (transaction_no)
 ) ENGINE=InnoDB;

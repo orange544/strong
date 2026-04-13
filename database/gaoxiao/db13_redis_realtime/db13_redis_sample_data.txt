@@ -1,0 +1,23 @@
+﻿# DB13 门禁实时状态库（Redis）
+SELECT 13
+FLUSHDB
+
+# door:{id}:status
+HSET door:ACC_DEV_001:status device_id ACC_DEV_001 building_code BLD_A door_name "东门闸机1" online_status online alarm_flag 0
+HSET door:ACC_DEV_002:status device_id ACC_DEV_002 building_code BLD_B door_name "图书馆北门" online_status offline alarm_flag 1
+HSET door:ACC_DEV_003:status device_id ACC_DEV_003 building_code BLD_C door_name "宿舍5栋入口" online_status online alarm_flag 0
+
+# door:{id}:alarm
+HSET door:ACC_DEV_001:alarm alarm_level low alarm_code ALM_0001 alarm_desc "设备运行正常" alarm_time "2026-03-29 20:31:00"
+HSET door:ACC_DEV_002:alarm alarm_level high alarm_code ALM_0002 alarm_desc "设备离线告警" alarm_time "2026-03-29 20:31:05"
+HSET door:ACC_DEV_003:alarm alarm_level low alarm_code ALM_0003 alarm_desc "无异常" alarm_time "2026-03-29 20:31:09"
+
+# person:{id}:last_access
+HSET person:STU_2025_0001:last_access person_id STU_2025_0001 person_name "张晨" door_id ACC_DEV_003 access_time "2026-03-29 07:12:03" access_result success direction in
+HSET person:STU_2025_0088:last_access person_id STU_2025_0088 person_name "李媛" door_id ACC_DEV_003 access_time "2026-03-29 22:35:11" access_result success direction out
+HSET person:T00021:last_access person_id T00021 person_name "刘强" door_id ACC_DEV_002 access_time "2026-03-29 08:05:42" access_result denied direction in
+
+# blacklist:{person_id}
+HSET blacklist:STU_2025_9001 person_id STU_2025_9001 person_name "测试黑名单1" reason "多次非法闯入" status active
+HSET blacklist:STU_2025_9002 person_id STU_2025_9002 person_name "测试黑名单2" reason "冒用他人门禁卡" status active
+HSET blacklist:EXT_VISITOR_0001 person_id EXT_VISITOR_0001 person_name "异常访客" reason "冲闸行为" status active

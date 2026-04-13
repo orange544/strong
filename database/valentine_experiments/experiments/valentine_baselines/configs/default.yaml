@@ -1,0 +1,18 @@
+experiment_name: valentine_baseline_comparison
+default_methods:
+  - coma
+  - simflooding
+  - isresmat
+  - unicorn
+default_datasets:
+  - Magellan
+  - OpenData
+evaluation:
+  one_to_one: true
+  top_k: null
+  top_percent: null
+outputs:
+  write_raw_predictions: true
+  write_per_pair_metrics: true
+  write_summary_metrics: true
+

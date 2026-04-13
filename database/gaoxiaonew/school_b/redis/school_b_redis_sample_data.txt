@@ -1,0 +1,3 @@
+SELECT 2
+SET fieldmap:admission_employment_db.career_outcome.career_type 毕业去向类型
+PERSIST fieldmap:admission_employment_db.career_outcome.career_type
